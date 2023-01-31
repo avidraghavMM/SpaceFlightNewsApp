@@ -2,19 +2,22 @@ package com.raghav.spacedawn.repository
 
 import com.raghav.spacedawn.db.ReminderDao
 import com.raghav.spacedawn.db.ReminderModelClass
-import com.raghav.spacedawn.network.RetrofitInstance
+import com.raghav.spacedawn.network.LaunchLibrary
+import com.raghav.spacedawn.network.SpaceFlightAPI
 
 class AppRepository(
-    private val dao: ReminderDao
+    private val dao: ReminderDao,
+    private val spaceFlightApi: SpaceFlightAPI,
+    private val launchLibraryApi: LaunchLibrary
 ) : IAppRepository {
     override suspend fun getArticles(skipArticles: Int) =
-        RetrofitInstance.api_spaceflight.getArticles(skipArticles)
+        spaceFlightApi.getArticles(skipArticles)
 
     override suspend fun searchArticle(searchQuery: String, skipArticles: Int) =
-        RetrofitInstance.api_spaceflight.searchArticles(searchQuery, skipArticles)
+        spaceFlightApi.searchArticles(searchQuery, skipArticles)
 
     override suspend fun getLaunches(skipLaunches: Int) =
-        RetrofitInstance.api_launchlibrary.getLaunches(skipLaunches)
+        launchLibraryApi.getLaunches(skipLaunches)
 
     override suspend fun insert(reminder: ReminderModelClass) =
         dao.saveReminder(reminder)

@@ -18,8 +18,10 @@ import com.raghav.spacedawn.databinding.FragmentRemindersListBinding
 import com.raghav.spacedawn.db.ReminderModelClass
 import com.raghav.spacedawn.ui.AppViewModel
 import com.raghav.spacedawn.utils.AlarmBroadCastReciever
+import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.launch
 
+@AndroidEntryPoint
 class RemindersListFragment : Fragment(R.layout.fragment_reminders_list) {
     private val viewModel by viewModels<AppViewModel>()
     lateinit var binding: FragmentRemindersListBinding
