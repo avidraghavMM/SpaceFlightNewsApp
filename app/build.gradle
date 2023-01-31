@@ -3,6 +3,8 @@ plugins {
     id 'kotlin-android'
     id "androidx.navigation.safeargs.kotlin"
     id 'kotlin-kapt'
+    // hilt plugin
+    id 'dagger.hilt.android.plugin'
 }
 
 android {
@@ -76,4 +78,11 @@ dependencies {
 
     // optional - Kotlin Extensions and Coroutines support for Room
     implementation "androidx.room:room-ktx:2.4.0"
+
+    //Dagger-Hilt Dependencies
+    implementation 'com.google.dagger:hilt-android:2.42'
+    kapt 'com.google.dagger:hilt-android-compiler:2.42'
+}
+kapt {
+    correctErrorTypes = true
 }
