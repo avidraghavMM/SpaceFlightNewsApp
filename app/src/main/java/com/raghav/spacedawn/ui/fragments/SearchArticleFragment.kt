@@ -7,6 +7,7 @@ import android.widget.AbsListView
 import android.widget.Toast
 import androidx.core.widget.addTextChangedListener
 import androidx.fragment.app.Fragment
+import androidx.fragment.app.viewModels
 import androidx.lifecycle.Observer
 import androidx.navigation.fragment.findNavController
 import androidx.recyclerview.widget.LinearLayoutManager
@@ -15,18 +16,19 @@ import com.raghav.spacedawn.R
 import com.raghav.spacedawn.adapters.ArticlesAdapter
 import com.raghav.spacedawn.databinding.FragmentSearchArticleBinding
 import com.raghav.spacedawn.ui.AppViewModel
-import com.raghav.spacedawn.ui.MainActivity
 import com.raghav.spacedawn.utils.Constants
 import com.raghav.spacedawn.utils.Constants.Companion.DELAY_TIME
 import com.raghav.spacedawn.utils.Resource
+import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.MainScope
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 
+@AndroidEntryPoint
 class SearchArticleFragment : Fragment(R.layout.fragment_search_article) {
 
-    lateinit var viewModel: AppViewModel
+    private val viewModel by viewModels<AppViewModel>()
     lateinit var articlesAdapter: ArticlesAdapter
     private lateinit var binding: FragmentSearchArticleBinding
     private val TAG = "SearchArticleFragment"
@@ -35,7 +37,6 @@ class SearchArticleFragment : Fragment(R.layout.fragment_search_article) {
         super.onViewCreated(view, savedInstanceState)
         binding = FragmentSearchArticleBinding.bind(view)
         setupRecyclerView()
-        viewModel = (activity as MainActivity).viewModel
 
         articlesAdapter.setOnItemClickListener {
             val bundle = Bundle().apply {
@@ -76,7 +77,11 @@ class SearchArticleFragment : Fragment(R.layout.fragment_search_article) {
                         hideProgressBar()
                         Log.d(TAG, "inside failure")
                         response.message?.let { message ->
-                            Toast.makeText(activity, "An error occured: $message", Toast.LENGTH_LONG)
+                            Toast.makeText(
+                                activity,
+                                "An error occured: $message",
+                                Toast.LENGTH_LONG
+                            )
                                 .show()
                             showErrorMessage(message)
                         }
