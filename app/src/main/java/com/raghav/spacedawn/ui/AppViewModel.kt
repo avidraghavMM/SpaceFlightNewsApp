@@ -1,26 +1,30 @@
 package com.raghav.spacedawn.ui
 
-import android.app.Application
+import android.annotation.SuppressLint
 import android.content.Context
 import android.net.ConnectivityManager
 import android.net.NetworkCapabilities
-import androidx.lifecycle.AndroidViewModel
 import androidx.lifecycle.MutableLiveData
+import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.raghav.spacedawn.db.ReminderModelClass
 import com.raghav.spacedawn.models.launchlibrary.LaunchLibraryResponse
 import com.raghav.spacedawn.models.spaceflightapi.ArticlesResponse
 import com.raghav.spacedawn.repository.AppRepository
-import com.raghav.spacedawn.utils.AppApplication
 import com.raghav.spacedawn.utils.Resource
+import dagger.hilt.android.lifecycle.HiltViewModel
+import dagger.hilt.android.qualifiers.ApplicationContext
 import kotlinx.coroutines.launch
 import retrofit2.Response
 import java.io.IOException
+import javax.inject.Inject
 
-class AppViewModel(
-    app: Application,
-    val repository: AppRepository
-) : AndroidViewModel(app) {
+@SuppressLint("StaticFieldLeak")
+@HiltViewModel
+class AppViewModel @Inject constructor(
+    @ApplicationContext private val appContext: Context,
+    private val repository: AppRepository
+) : ViewModel() {
 
     val articlesList: MutableLiveData<Resource<ArticlesResponse>> = MutableLiveData()
     var articlesResponse: ArticlesResponse? = null
@@ -42,9 +46,11 @@ class AppViewModel(
     fun getArticlesList() = viewModelScope.launch {
         safeGetArticleApiCall()
     }
+
     fun getSearchArticleList(searchQuery: String) = viewModelScope.launch {
         safeSearchArticleApiCall(searchQuery)
     }
+
     fun getLaunchesList() = viewModelScope.launch {
         safeGetLauchesApiCall()
     }
@@ -65,6 +71,7 @@ class AppViewModel(
             }
         }
     }
+
     private suspend fun safeGetArticleApiCall() {
         try {
             if (hasInternetConnection()) {
@@ -81,6 +88,7 @@ class AppViewModel(
             }
         }
     }
+
     private suspend fun safeGetLauchesApiCall() {
         try {
             if (hasInternetConnection()) {
@@ -131,6 +139,7 @@ class AppViewModel(
         }
         return Resource.Error(response.message())
     }
+
     private fun handleSearchResponse(response: Response<ArticlesResponse>): Resource<ArticlesResponse> {
         if (response.isSuccessful) {
             response.body()?.let {
@@ -147,6 +156,7 @@ class AppViewModel(
         }
         return Resource.Error(response.message())
     }
+
     fun saveReminder(reminder: ReminderModelClass) = viewModelScope.launch {
         repository.insert(reminder)
     }
@@ -160,7 +170,7 @@ class AppViewModel(
     }
 
     private fun hasInternetConnection(): Boolean {
-        val connectivityManager = getApplication<AppApplication>().getSystemService(
+        val connectivityManager = appContext.getSystemService(
             Context.CONNECTIVITY_SERVICE
         ) as ConnectivityManager
 

@@ -15,5 +15,8 @@ class Constants {
         const val MinutestoMiliseconds: Long = 900000 // 15 minutes
         const val STATUS_SET = "Reminder Set"
         const val STATUS_CANCELLED = "CANCELLED"
+        const val SPACE_FLIGHT_API = "space_flight_api"
+        const val LAUNCH_LIBRARY_API = "retrofit_client_for_launch_library_api"
+        const val DATABASE_NAME = "reminder_db.db"
     }
 }

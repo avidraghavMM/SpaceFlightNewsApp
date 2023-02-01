@@ -6,6 +6,7 @@ import android.view.View
 import android.widget.AbsListView
 import android.widget.Toast
 import androidx.fragment.app.Fragment
+import androidx.fragment.app.viewModels
 import androidx.lifecycle.Observer
 import androidx.navigation.fragment.findNavController
 import androidx.recyclerview.widget.LinearLayoutManager
@@ -14,13 +15,14 @@ import com.raghav.spacedawn.R
 import com.raghav.spacedawn.adapters.ArticlesAdapter
 import com.raghav.spacedawn.databinding.FragmentArticlesListBinding
 import com.raghav.spacedawn.ui.AppViewModel
-import com.raghav.spacedawn.ui.MainActivity
 import com.raghav.spacedawn.utils.Constants.Companion.QUERY_PAGE_SIZE
 import com.raghav.spacedawn.utils.Resource
+import dagger.hilt.android.AndroidEntryPoint
 
+@AndroidEntryPoint
 class ArticlesListFragment : Fragment(R.layout.fragment_articles_list) {
 
-    lateinit var viewModel: AppViewModel
+    private val viewModel by viewModels<AppViewModel>()
     lateinit var articlesAdapter: ArticlesAdapter
     private lateinit var binding: FragmentArticlesListBinding
     private val TAG = "ArticlesListFragment"
@@ -29,8 +31,6 @@ class ArticlesListFragment : Fragment(R.layout.fragment_articles_list) {
         super.onViewCreated(view, savedInstanceState)
         binding = FragmentArticlesListBinding.bind(view)
         setupRecyclerView()
-
-        viewModel = (activity as MainActivity).viewModel
 
         articlesAdapter.setOnItemClickListener {
             val bundle = Bundle().apply {
@@ -57,7 +57,11 @@ class ArticlesListFragment : Fragment(R.layout.fragment_articles_list) {
                         hideProgressBar()
                         Log.d(TAG, "inside failure")
                         response.message?.let { message ->
-                            Toast.makeText(activity, "An error occured: $message", Toast.LENGTH_LONG).show()
+                            Toast.makeText(
+                                activity,
+                                "An error occured: $message",
+                                Toast.LENGTH_LONG
+                            ).show()
                             showErrorMessage(message)
                         }
                     }
@@ -71,6 +75,7 @@ class ArticlesListFragment : Fragment(R.layout.fragment_articles_list) {
             viewModel.getArticlesList()
         }
     }
+
     private fun hideProgressBar() {
         binding.paginationProgressBar.visibility = View.INVISIBLE
         isLoading = false
@@ -80,10 +85,12 @@ class ArticlesListFragment : Fragment(R.layout.fragment_articles_list) {
         binding.paginationProgressBar.visibility = View.VISIBLE
         isLoading = true
     }
+
     private fun hideErrorMessage() {
         binding.itemErrorMessage.visibility = View.INVISIBLE
         isError = false
     }
+
     private fun showErrorMessage(message: String) {
         binding.itemErrorMessage.visibility = View.VISIBLE
         binding.tvErrorMessage.text = message
@@ -117,6 +124,7 @@ class ArticlesListFragment : Fragment(R.layout.fragment_articles_list) {
                 binding.rvArticles.setPadding(0, 0, 0, 0)
             }
         }
+
         override fun onScrollStateChanged(recyclerView: RecyclerView, newState: Int) {
             super.onScrollStateChanged(recyclerView, newState)
             if (newState == AbsListView.OnScrollListener.SCROLL_STATE_TOUCH_SCROLL) {

@@ -10,6 +10,7 @@ import android.view.View
 import android.widget.AbsListView
 import android.widget.Toast
 import androidx.fragment.app.Fragment
+import androidx.fragment.app.viewModels
 import androidx.lifecycle.Observer
 import androidx.lifecycle.lifecycleScope
 import androidx.recyclerview.widget.LinearLayoutManager
@@ -20,7 +21,6 @@ import com.raghav.spacedawn.databinding.FragmentLaunchesListBinding
 import com.raghav.spacedawn.db.ReminderModelClass
 import com.raghav.spacedawn.models.launchlibrary.LaunchLibraryResponseItem
 import com.raghav.spacedawn.ui.AppViewModel
-import com.raghav.spacedawn.ui.MainActivity
 import com.raghav.spacedawn.utils.AlarmBroadCastReciever
 import com.raghav.spacedawn.utils.Constants
 import com.raghav.spacedawn.utils.Constants.Companion.MinutestoMiliseconds
@@ -29,14 +29,16 @@ import com.raghav.spacedawn.utils.Constants.Companion.STATUS_SET
 import com.raghav.spacedawn.utils.Helpers.Companion.formatTo
 import com.raghav.spacedawn.utils.Helpers.Companion.toDate
 import com.raghav.spacedawn.utils.Resource
+import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 
+@AndroidEntryPoint
 class LaunchesListFragment : Fragment(R.layout.fragment_launches_list) {
 
-    lateinit var viewModel: AppViewModel
+    private val viewModel by viewModels<AppViewModel>()
     lateinit var launchesAdapter: LaunchesAdapter
     private lateinit var binding: FragmentLaunchesListBinding
     private val TAG = "LaunchesListFragment"
@@ -45,8 +47,6 @@ class LaunchesListFragment : Fragment(R.layout.fragment_launches_list) {
         super.onViewCreated(view, savedInstanceState)
         binding = FragmentLaunchesListBinding.bind(view)
         setupRecyclerView()
-
-        viewModel = (activity as MainActivity).viewModel
 
         launchesAdapter.setOnItemClickListener {
             val dateTime = it.net.toDate(Constants.LAUNCH_DATE_INPUT_FORMAT)
@@ -84,7 +84,11 @@ class LaunchesListFragment : Fragment(R.layout.fragment_launches_list) {
                         hideProgressBar()
                         Log.d(TAG, "inside failure")
                         response.message?.let { message ->
-                            Toast.makeText(activity, "An error occured: $message", Toast.LENGTH_LONG)
+                            Toast.makeText(
+                                activity,
+                                "An error occured: $message",
+                                Toast.LENGTH_LONG
+                            )
                                 .show()
                             showErrorMessage(message)
                         }
