@@ -1,5 +1,6 @@
 package com.raghav.spacedawn.ui
 
+import android.annotation.SuppressLint
 import android.content.Context
 import android.net.ConnectivityManager
 import android.net.NetworkCapabilities
@@ -9,19 +10,20 @@ import androidx.lifecycle.viewModelScope
 import com.raghav.spacedawn.db.ReminderModelClass
 import com.raghav.spacedawn.models.launchlibrary.LaunchLibraryResponse
 import com.raghav.spacedawn.models.spaceflightapi.ArticlesResponse
-import com.raghav.spacedawn.repository.IAppRepository
-import com.raghav.spacedawn.utils.AppApplication
+import com.raghav.spacedawn.repository.AppRepository
 import com.raghav.spacedawn.utils.Resource
 import dagger.hilt.android.lifecycle.HiltViewModel
+import dagger.hilt.android.qualifiers.ApplicationContext
 import kotlinx.coroutines.launch
 import retrofit2.Response
 import java.io.IOException
 import javax.inject.Inject
 
+@SuppressLint("StaticFieldLeak")
 @HiltViewModel
 class AppViewModel @Inject constructor(
-    private val repository: IAppRepository,
-    private val appApplication: AppApplication
+    @ApplicationContext private val appContext: Context,
+    private val repository: AppRepository
 ) : ViewModel() {
 
     val articlesList: MutableLiveData<Resource<ArticlesResponse>> = MutableLiveData()
@@ -168,7 +170,7 @@ class AppViewModel @Inject constructor(
     }
 
     private fun hasInternetConnection(): Boolean {
-        val connectivityManager = appApplication.getSystemService(
+        val connectivityManager = appContext.getSystemService(
             Context.CONNECTIVITY_SERVICE
         ) as ConnectivityManager
 
