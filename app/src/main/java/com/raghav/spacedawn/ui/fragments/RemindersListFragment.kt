@@ -53,7 +53,7 @@ class RemindersListFragment : Fragment(R.layout.fragment_reminders_list) {
             activity,
             reminder.pendingIntentId,
             i,
-            PendingIntent.FLAG_CANCEL_CURRENT
+            PendingIntent.FLAG_CANCEL_CURRENT or PendingIntent.FLAG_IMMUTABLE
         )
         am.cancel(pi)
         pi.cancel()
