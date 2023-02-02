@@ -4,8 +4,8 @@ import android.annotation.SuppressLint
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.raghav.spacedawn.db.ReminderModelClass
 import com.raghav.spacedawn.models.launchlibrary.LaunchLibraryResponse
+import com.raghav.spacedawn.models.reminder.ReminderModelClass
 import com.raghav.spacedawn.models.spaceflightapi.ArticlesResponse
 import com.raghav.spacedawn.models.spaceflightapi.ArticlesResponseItem
 import com.raghav.spacedawn.repository.AppRepository

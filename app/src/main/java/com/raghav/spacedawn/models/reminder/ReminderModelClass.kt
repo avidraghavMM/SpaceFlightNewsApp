@@ -1,4 +1,4 @@
-package com.raghav.spacedawn.db
+package com.raghav.spacedawn.models.reminder
 
 import androidx.room.Entity
 import androidx.room.PrimaryKey

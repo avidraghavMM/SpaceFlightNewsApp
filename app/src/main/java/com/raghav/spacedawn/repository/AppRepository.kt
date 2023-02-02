@@ -2,8 +2,8 @@ package com.raghav.spacedawn.repository
 
 import android.content.Context
 import com.raghav.spacedawn.db.ReminderDao
-import com.raghav.spacedawn.db.ReminderModelClass
 import com.raghav.spacedawn.db.SpaceFlightDao
+import com.raghav.spacedawn.models.reminder.ReminderModelClass
 import com.raghav.spacedawn.models.spaceflightapi.ArticlesResponseItem
 import com.raghav.spacedawn.network.LaunchLibrary
 import com.raghav.spacedawn.network.SpaceFlightAPI
@@ -20,6 +20,11 @@ class AppRepository @Inject constructor(
     private val launchLibraryApi: LaunchLibrary
 ) {
 
+    /**
+     * Returns a list of articles from database after saving the api response
+     * in database if Internet connection available.
+     * In case there is no data in database an empty list is returned
+     * */
     suspend fun getArticles(skipArticles: Int): Flow<List<ArticlesResponseItem>> {
         if (appContext.isConnectedToNetwork()) {
             spaceFlightDao.saveArticles(spaceFlightApi.getArticles(skipArticles))
