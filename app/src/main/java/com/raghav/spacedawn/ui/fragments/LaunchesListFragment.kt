@@ -5,13 +5,11 @@ import android.app.PendingIntent
 import android.content.Context
 import android.content.Intent
 import android.os.Bundle
-import android.util.Log
 import android.view.View
 import android.widget.AbsListView
 import android.widget.Toast
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.viewModels
-import androidx.lifecycle.Observer
 import androidx.lifecycle.lifecycleScope
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
@@ -48,6 +46,34 @@ class LaunchesListFragment : Fragment(R.layout.fragment_launches_list) {
         binding = FragmentLaunchesListBinding.bind(view)
         setupRecyclerView()
 
+
+        viewLifecycleOwner.lifecycleScope.launchWhenStarted {
+            viewModel.launchesFlow.collect {
+                when (it) {
+                    is Resource.Error -> {
+                        hideProgressBar()
+                        Toast.makeText(
+                            requireContext(),
+                            "An error occurred: ${it.message}",
+                            Toast.LENGTH_LONG
+                        ).show()
+                        showErrorMessage(it.message.orEmpty())
+                    }
+                    is Resource.Loading -> {
+                        showProgressBar()
+                    }
+                    is Resource.Success -> {
+                        hideProgressBar()
+                        hideErrorMessage()
+                        if (it.data?.isEmpty() == true)
+                            showErrorMessage("Connect To Internet")
+                        else
+                            launchesAdapter.differ.submitList(it.data)
+                    }
+                }
+            }
+        }
+
         launchesAdapter.setOnItemClickListener {
             val dateTime = it.net.toDate(Constants.LAUNCH_DATE_INPUT_FORMAT)
             CoroutineScope(Dispatchers.IO).launch {
@@ -63,38 +89,6 @@ class LaunchesListFragment : Fragment(R.layout.fragment_launches_list) {
                 }
             }
         }
-
-        viewModel.launchesList.observe(
-            viewLifecycleOwner,
-            Observer { response ->
-                when (response) {
-                    is Resource.Loading -> {
-                        showProgressBar()
-                    }
-                    is Resource.Success -> {
-                        hideProgressBar()
-                        hideErrorMessage()
-                        response.data?.let {
-                            launchesAdapter.differ.submitList(it.results.toList())
-                        }
-                        Log.d(TAG, "inside success")
-                    }
-                    is Resource.Error -> {
-                        hideProgressBar()
-                        Log.d(TAG, "inside failure")
-                        response.message?.let { message ->
-                            Toast.makeText(
-                                activity,
-                                "An error occured: $message",
-                                Toast.LENGTH_LONG
-                            )
-                                .show()
-                            showErrorMessage(message)
-                        }
-                    }
-                }
-            }
-        )
 
         binding.btnRetry.setOnClickListener {
             viewModel.getLaunchesList()
@@ -181,7 +175,7 @@ class LaunchesListFragment : Fragment(R.layout.fragment_launches_list) {
             val isNotAtBeginning = firstVisibleItemPosition >= 0
             val isTotalMoreThanVisible = totalItemCount >= QUERY_PAGE_SIZE
             val shouldPaginate = isNotLoadingAndNotLastPage && isAtLastItem && isNotAtBeginning &&
-                isTotalMoreThanVisible && isScrolling
+                    isTotalMoreThanVisible && isScrolling
             if (shouldPaginate) {
                 viewModel.getLaunchesList()
                 isScrolling = false

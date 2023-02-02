@@ -33,4 +33,8 @@ object DatabaseModule {
     @Singleton
     @Provides
     fun provideSpaceFlightDao(database: AppDatabase) = database.getSpaceFlightDao()
+
+    @Singleton
+    @Provides
+    fun provideLaunchLibraryDao(database: AppDatabase) = database.getLaunchLibraryDao()
 }
