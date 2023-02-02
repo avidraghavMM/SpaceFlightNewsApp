@@ -12,6 +12,7 @@ import com.raghav.spacedawn.network.SpaceFlightAPI
 import com.raghav.spacedawn.utils.Helpers.Companion.isConnectedToNetwork
 import dagger.hilt.android.qualifiers.ApplicationContext
 import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.flow
 import javax.inject.Inject
 
 class AppRepository @Inject constructor(
@@ -35,8 +36,17 @@ class AppRepository @Inject constructor(
         return spaceFlightDao.getArticles()
     }
 
-    suspend fun searchArticle(searchQuery: String, skipArticles: Int) =
-        spaceFlightApi.searchArticles(searchQuery, skipArticles)
+    suspend fun searchArticle(
+        searchQuery: String,
+        skipArticles: Int
+    ): Flow<List<ArticlesResponseItem>> = flow {
+        val result = if (appContext.isConnectedToNetwork()) {
+            spaceFlightApi.searchArticles(searchQuery, skipArticles)
+        } else {
+            emptyList()
+        }
+        emit(result)
+    }
 
     /**
      * Returns a list of launches from database after saving the api response

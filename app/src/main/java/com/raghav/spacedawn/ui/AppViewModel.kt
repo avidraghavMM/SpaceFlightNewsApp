@@ -1,21 +1,19 @@
 package com.raghav.spacedawn.ui
 
-import android.annotation.SuppressLint
-import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.raghav.spacedawn.models.launchlibrary.LaunchLibraryResponseItem
 import com.raghav.spacedawn.models.reminder.ReminderModelClass
-import com.raghav.spacedawn.models.spaceflightapi.ArticlesResponse
 import com.raghav.spacedawn.models.spaceflightapi.ArticlesResponseItem
 import com.raghav.spacedawn.repository.AppRepository
 import com.raghav.spacedawn.utils.Resource
 import dagger.hilt.android.lifecycle.HiltViewModel
-import kotlinx.coroutines.flow.*
+import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.asStateFlow
+import kotlinx.coroutines.flow.catch
 import kotlinx.coroutines.launch
 import javax.inject.Inject
 
-@SuppressLint("StaticFieldLeak")
 @HiltViewModel
 class AppViewModel @Inject constructor(
     private val repository: AppRepository
@@ -24,18 +22,20 @@ class AppViewModel @Inject constructor(
     private val _articlesFlow =
         MutableStateFlow<Resource<List<ArticlesResponseItem>>>(Resource.Loading())
     val articlesFlow = _articlesFlow.asStateFlow()
-    var articlesList: MutableList<ArticlesResponseItem>? = null
-    var skipArticle = 0
+    private var articlesList: MutableList<ArticlesResponseItem>? = null
+    private var skipArticle = 0
 
-    val searchArticleList: MutableLiveData<Resource<ArticlesResponse>> = MutableLiveData()
-    var skipSearchArticle = 0
-    var searchArticleResponse: ArticlesResponse? = null
+    private val _searchArticlesFlow =
+        MutableStateFlow<Resource<List<ArticlesResponseItem>>>(Resource.Success(emptyList()))
+    val searchArticlesFlow = _searchArticlesFlow.asStateFlow()
+    private var skipSearchArticle = 0
+    var searchArticleList: MutableList<ArticlesResponseItem>? = null
 
     private val _launchesFlow =
         MutableStateFlow<Resource<List<LaunchLibraryResponseItem>>>(Resource.Loading())
     val launchesFlow = _launchesFlow.asStateFlow()
-    var launchesList: MutableList<LaunchLibraryResponseItem>? = null
-    var skipLaunches = 0
+    private var launchesList: MutableList<LaunchLibraryResponseItem>? = null
+    private var skipLaunches = 0
 
     init {
         getArticlesList()
@@ -62,7 +62,25 @@ class AppViewModel @Inject constructor(
     }
 
     fun getSearchArticleList(searchQuery: String) = viewModelScope.launch {
-        //safeSearchArticleApiCall(searchQuery)
+        repository.searchArticle(searchQuery, skipSearchArticle)
+            .catch {
+                _searchArticlesFlow.emit(Resource.Error("Error Occurred: ${it.localizedMessage}"))
+            }
+            .collect {
+                skipSearchArticle += 10
+                if (searchArticleList == null) {
+                    searchArticleList = it.toMutableList()
+                } else {
+                    val oldArticles = searchArticleList
+                    val newArticles = it.toMutableList()
+                    oldArticles?.addAll(newArticles)
+                }
+                _searchArticlesFlow.emit(
+                    Resource.Success(
+                        searchArticleList?.toList() ?: emptyList()
+                    )
+                )
+            }
     }
 
     fun getLaunchesList() = viewModelScope.launch {
@@ -82,62 +100,6 @@ class AppViewModel @Inject constructor(
                 _launchesFlow.emit(Resource.Success(launchesList?.toList() ?: emptyList()))
             }
     }
-
-//    private suspend fun safeSearchArticleApiCall(searchQuery: String) {
-//        try {
-//            if (hasInternetConnection()) {
-//                searchArticleList.postValue(Resource.Loading())
-//                val response = repository.searchArticle(searchQuery, skipSearchArticle)
-//                searchArticleList.postValue(handleSearchResponse(response))
-//            } else {
-//                searchArticleList.postValue(Resource.Error("No Internet Connection"))
-//            }
-//        } catch (t: Throwable) {
-//            when (t) {
-//                is IOException -> searchArticleList.postValue(Resource.Error("Network Failure"))
-//                else -> searchArticleList.postValue(Resource.Error("Conversion Error"))
-//            }
-//        }
-//    }
-
-//    private suspend fun safeGetArticleApiCall() {
-//        try {
-//            val response = repository.getArticles(skipArticle)
-//            response.let {
-//                skipArticle += 10
-//                if (articlesResponse == null) {
-//                    articlesResponse = it
-//                } else {
-//                    val oldArticles = articlesResponse?.list
-//                    val newArticles = it.list ?: emptyList()
-//                    oldArticles?.addAll(newArticles)
-//                }
-//                articlesList.postValue(Resource.Success(articlesResponse ?: it))
-//            }
-//        } catch (t: Throwable) {
-//            when (t) {
-//                is IOException -> articlesList.postValue(Resource.Error("Network Failure"))
-//                else -> articlesList.postValue(Resource.Error("Conversion Error"))
-//            }
-//        }
-//    }
-
-//    private fun handleSearchResponse(response: Response<ArticlesResponse>): Resource<ArticlesResponse> {
-//        if (response.isSuccessful) {
-//            response.body()?.let {
-//                skipSearchArticle += 10
-//                if (searchArticleResponse == null) {
-//                    searchArticleResponse = it
-//                } else {
-//                    val oldArticles = searchArticleResponse?.list
-//                    val newArticles = it.list ?: emptyList()
-//                    oldArticles?.addAll(newArticles)
-//                }
-//                return Resource.Success(searchArticleResponse ?: it)
-//            }
-//        }
-//        return Resource.Error(response.message())
-//    }
 
     fun saveReminder(reminder: ReminderModelClass) = viewModelScope.launch {
         repository.insert(reminder)
