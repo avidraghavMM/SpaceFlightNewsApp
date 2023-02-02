@@ -4,9 +4,11 @@ import android.os.Bundle
 import android.util.Log
 import android.view.View
 import android.widget.AbsListView
+import android.widget.Toast
 import androidx.core.widget.addTextChangedListener
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.viewModels
+import androidx.lifecycle.lifecycleScope
 import androidx.navigation.fragment.findNavController
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
@@ -16,6 +18,7 @@ import com.raghav.spacedawn.databinding.FragmentSearchArticleBinding
 import com.raghav.spacedawn.ui.AppViewModel
 import com.raghav.spacedawn.utils.Constants
 import com.raghav.spacedawn.utils.Constants.Companion.DELAY_TIME
+import com.raghav.spacedawn.utils.Resource
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.MainScope
@@ -40,8 +43,7 @@ class SearchArticleFragment : Fragment(R.layout.fragment_search_article) {
                 putSerializable("article", it)
             }
             findNavController().navigate(
-                R.id.action_searchArticleFragment_to_articleDisplayFragment,
-                bundle
+                R.id.action_searchArticleFragment_to_articleDisplayFragment, bundle
             )
         }
         // Search Articles functionality implementation
@@ -58,38 +60,30 @@ class SearchArticleFragment : Fragment(R.layout.fragment_search_article) {
                 }
             }
         }
-//        viewModel.searchArticleList.observe(
-//            viewLifecycleOwner,
-//            Observer { response ->
-//                when (response) {
-//                    is Resource.Success -> {
-//                        Log.d(TAG, "inside success")
-//                        hideProgressBar()
-//                        hideErrorMessage()
-//                        response.data?.let {
-//                            articlesAdapter.differ.submitList(it)
-//                        }
-//                    }
-//                    is Resource.Error -> {
-//                        hideProgressBar()
-//                        Log.d(TAG, "inside failure")
-//                        response.message?.let { message ->
-//                            Toast.makeText(
-//                                activity,
-//                                "An error occured: $message",
-//                                Toast.LENGTH_LONG
-//                            )
-//                                .show()
-//                            showErrorMessage(message)
-//                        }
-//                    }
-//                    is Resource.Loading -> {
-//                        Log.d(TAG, "inside loading")
-//                        showProgressBar()
-//                    }
-//                }
-//            }
-//        )
+
+        viewLifecycleOwner.lifecycleScope.launchWhenStarted {
+            viewModel.searchArticlesFlow.collect {
+                when (it) {
+                    is Resource.Error -> {
+                        hideProgressBar()
+                        Log.d(TAG, "inside failure")
+                        Toast.makeText(
+                            requireContext(), "An error occurred: ${it.message}", Toast.LENGTH_LONG
+                        ).show()
+                        showErrorMessage(it.message.orEmpty())
+                    }
+                    is Resource.Loading -> {
+                        if (binding.etSearch.text.isEmpty())
+                            showProgressBar()
+                    }
+                    is Resource.Success -> {
+                        hideProgressBar()
+                        hideErrorMessage()
+                        articlesAdapter.differ.submitList(it.data)
+                    }
+                }
+            }
+        }
         binding.btnRetry.setOnClickListener {
             if (binding.etSearch.text.toString().isNotEmpty()) {
                 viewModel.getSearchArticleList(binding.etSearch.text.toString())
@@ -138,8 +132,8 @@ class SearchArticleFragment : Fragment(R.layout.fragment_search_article) {
             val isAtLastItem = firstVisibleItemPosition + visibleItemCount >= totalItemCount
             val isNotAtBeginning = firstVisibleItemPosition >= 0
             val isTotalMoreThanVisible = totalItemCount >= Constants.QUERY_PAGE_SIZE
-            val shouldPaginate = isNotLoadingAndNotLastPage && isAtLastItem && isNotAtBeginning &&
-                isTotalMoreThanVisible && isScrolling
+            val shouldPaginate =
+                isNotLoadingAndNotLastPage && isAtLastItem && isNotAtBeginning && isTotalMoreThanVisible && isScrolling
             Log.d(TAG, shouldPaginate.toString())
             if (shouldPaginate) {
                 viewModel.getSearchArticleList(binding.etSearch.text.toString())
