@@ -69,36 +69,6 @@ class ArticlesListFragment : Fragment(R.layout.fragment_articles_list) {
                 bundle
             )
         }
-
-//        viewModel.articlesList.observe(
-//            viewLifecycleOwner,
-//            Observer { response ->
-//                when (response) {
-//                    is Resource.Success -> {
-//                        hideProgressBar()
-//                        hideErrorMessage()
-//                        response.data?.let {
-//                            articlesAdapter.differ.submitList(it.list?.toList() ?: emptyList())
-//                        }
-//                    }
-//                    is Resource.Error -> {
-//                        hideProgressBar()
-//                        Log.d(TAG, "inside failure")
-//                        response.message?.let { message ->
-//                            Toast.makeText(
-//                                activity,
-//                                "An error occured: $message",
-//                                Toast.LENGTH_LONG
-//                            ).show()
-//                            showErrorMessage(message)
-//                        }
-//                    }
-//                    is Resource.Loading -> {
-//                        showProgressBar()
-//                    }
-//                }
-//            }
-//        )
         binding.btnRetry.setOnClickListener {
             viewModel.getArticlesList()
         }

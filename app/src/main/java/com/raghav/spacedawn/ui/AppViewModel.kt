@@ -4,7 +4,7 @@ import android.annotation.SuppressLint
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.raghav.spacedawn.models.launchlibrary.LaunchLibraryResponse
+import com.raghav.spacedawn.models.launchlibrary.LaunchLibraryResponseItem
 import com.raghav.spacedawn.models.reminder.ReminderModelClass
 import com.raghav.spacedawn.models.spaceflightapi.ArticlesResponse
 import com.raghav.spacedawn.models.spaceflightapi.ArticlesResponseItem
@@ -13,7 +13,6 @@ import com.raghav.spacedawn.utils.Resource
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.*
 import kotlinx.coroutines.launch
-import retrofit2.Response
 import javax.inject.Inject
 
 @SuppressLint("StaticFieldLeak")
@@ -25,7 +24,6 @@ class AppViewModel @Inject constructor(
     private val _articlesFlow =
         MutableStateFlow<Resource<List<ArticlesResponseItem>>>(Resource.Loading())
     val articlesFlow = _articlesFlow.asStateFlow()
-
     var articlesList: MutableList<ArticlesResponseItem>? = null
     var skipArticle = 0
 
@@ -33,13 +31,15 @@ class AppViewModel @Inject constructor(
     var skipSearchArticle = 0
     var searchArticleResponse: ArticlesResponse? = null
 
-    val launchesList: MutableLiveData<Resource<LaunchLibraryResponse>> = MutableLiveData()
-    var launchResponse: LaunchLibraryResponse? = null
+    private val _launchesFlow =
+        MutableStateFlow<Resource<List<LaunchLibraryResponseItem>>>(Resource.Loading())
+    val launchesFlow = _launchesFlow.asStateFlow()
+    var launchesList: MutableList<LaunchLibraryResponseItem>? = null
     var skipLaunches = 0
 
     init {
         getArticlesList()
-        //getLaunchesList()
+        getLaunchesList()
     }
 
     fun getArticlesList() {
@@ -66,7 +66,21 @@ class AppViewModel @Inject constructor(
     }
 
     fun getLaunchesList() = viewModelScope.launch {
-        //safeGetLauchesApiCall()
+        repository.getLaunches(skipLaunches)
+            .catch {
+                _launchesFlow.emit(Resource.Error("Error Occurred: ${it.localizedMessage}"))
+            }
+            .collect {
+                skipLaunches += 10
+                if (launchesList == null) {
+                    launchesList = it.toMutableList()
+                } else {
+                    val oldArticles = launchesList
+                    val newArticles = it.toMutableList()
+                    oldArticles?.addAll(newArticles)
+                }
+                _launchesFlow.emit(Resource.Success(launchesList?.toList() ?: emptyList()))
+            }
     }
 
 //    private suspend fun safeSearchArticleApiCall(searchQuery: String) {
@@ -107,40 +121,6 @@ class AppViewModel @Inject constructor(
 //            }
 //        }
 //    }
-
-//    private suspend fun safeGetLauchesApiCall() {
-//        try {
-//            if (hasInternetConnection()) {
-//                launchesList.postValue(Resource.Loading())
-//                val response = repository.getLaunches(skipLaunches)
-//                launchesList.postValue(handleLaunchesResponse(response))
-//            } else {
-//                launchesList.postValue(Resource.Error("No Internet Connection"))
-//            }
-//        } catch (t: Throwable) {
-//            when (t) {
-//                is IOException -> articlesList.postValue(Resource.Error("Network Failure"))
-//                else -> articlesList.postValue(Resource.Error("Conversion Error"))
-//            }
-//        }
-//    }
-
-    private fun handleLaunchesResponse(response: Response<LaunchLibraryResponse>): Resource<LaunchLibraryResponse>? {
-        if (response.isSuccessful) {
-            response.body()?.let {
-                skipLaunches += 10
-                if (launchResponse == null) {
-                    launchResponse = it
-                } else {
-                    val oldArticles = launchResponse!!.results
-                    val newArticles = it.results
-                    oldArticles.addAll(newArticles)
-                }
-                return Resource.Success(launchResponse ?: it)
-            }
-        }
-        return Resource.Error(response.message())
-    }
 
 //    private fun handleSearchResponse(response: Response<ArticlesResponse>): Resource<ArticlesResponse> {
 //        if (response.isSuccessful) {
