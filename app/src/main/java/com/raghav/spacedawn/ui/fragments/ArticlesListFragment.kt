@@ -7,7 +7,7 @@ import android.widget.AbsListView
 import android.widget.Toast
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.viewModels
-import androidx.lifecycle.Observer
+import androidx.lifecycle.lifecycleScope
 import androidx.navigation.fragment.findNavController
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
@@ -32,6 +32,34 @@ class ArticlesListFragment : Fragment(R.layout.fragment_articles_list) {
         binding = FragmentArticlesListBinding.bind(view)
         setupRecyclerView()
 
+        viewLifecycleOwner.lifecycleScope.launchWhenStarted {
+            viewModel.articlesFlow.collect {
+                when (it) {
+                    is Resource.Error -> {
+                        hideProgressBar()
+                        Log.d(TAG, "inside failure")
+                        Toast.makeText(
+                            requireContext(),
+                            "An error occurred: ${it.message}",
+                            Toast.LENGTH_LONG
+                        ).show()
+                        showErrorMessage(it.message.orEmpty())
+                    }
+                    is Resource.Loading -> {
+                        showProgressBar()
+                    }
+                    is Resource.Success -> {
+                        hideProgressBar()
+                        hideErrorMessage()
+                        if (it.data?.isEmpty() == true)
+                            showErrorMessage("Connect To Internet")
+                        else
+                            articlesAdapter.differ.submitList(it.data)
+                    }
+                }
+            }
+        }
+
         articlesAdapter.setOnItemClickListener {
             val bundle = Bundle().apply {
                 putSerializable("article", it)
@@ -42,35 +70,35 @@ class ArticlesListFragment : Fragment(R.layout.fragment_articles_list) {
             )
         }
 
-        viewModel.articlesList.observe(
-            viewLifecycleOwner,
-            Observer { response ->
-                when (response) {
-                    is Resource.Success -> {
-                        hideProgressBar()
-                        hideErrorMessage()
-                        response.data?.let {
-                            articlesAdapter.differ.submitList(it.toList())
-                        }
-                    }
-                    is Resource.Error -> {
-                        hideProgressBar()
-                        Log.d(TAG, "inside failure")
-                        response.message?.let { message ->
-                            Toast.makeText(
-                                activity,
-                                "An error occured: $message",
-                                Toast.LENGTH_LONG
-                            ).show()
-                            showErrorMessage(message)
-                        }
-                    }
-                    is Resource.Loading -> {
-                        showProgressBar()
-                    }
-                }
-            }
-        )
+//        viewModel.articlesList.observe(
+//            viewLifecycleOwner,
+//            Observer { response ->
+//                when (response) {
+//                    is Resource.Success -> {
+//                        hideProgressBar()
+//                        hideErrorMessage()
+//                        response.data?.let {
+//                            articlesAdapter.differ.submitList(it.list?.toList() ?: emptyList())
+//                        }
+//                    }
+//                    is Resource.Error -> {
+//                        hideProgressBar()
+//                        Log.d(TAG, "inside failure")
+//                        response.message?.let { message ->
+//                            Toast.makeText(
+//                                activity,
+//                                "An error occured: $message",
+//                                Toast.LENGTH_LONG
+//                            ).show()
+//                            showErrorMessage(message)
+//                        }
+//                    }
+//                    is Resource.Loading -> {
+//                        showProgressBar()
+//                    }
+//                }
+//            }
+//        )
         binding.btnRetry.setOnClickListener {
             viewModel.getArticlesList()
         }
@@ -116,7 +144,7 @@ class ArticlesListFragment : Fragment(R.layout.fragment_articles_list) {
             val isNotAtBeginning = firstVisibleItemPosition >= 0
             val isTotalMoreThanVisible = totalItemCount >= QUERY_PAGE_SIZE
             val shouldPaginate = isNotLoadingAndNotLastPage && isAtLastItem && isNotAtBeginning &&
-                isTotalMoreThanVisible && isScrolling
+                    isTotalMoreThanVisible && isScrolling
             if (shouldPaginate) {
                 viewModel.getArticlesList()
                 isScrolling = false
