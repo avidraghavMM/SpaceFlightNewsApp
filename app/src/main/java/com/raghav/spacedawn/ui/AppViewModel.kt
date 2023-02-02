@@ -1,33 +1,32 @@
 package com.raghav.spacedawn.ui
 
 import android.annotation.SuppressLint
-import android.content.Context
-import android.net.ConnectivityManager
-import android.net.NetworkCapabilities
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.raghav.spacedawn.db.ReminderModelClass
 import com.raghav.spacedawn.models.launchlibrary.LaunchLibraryResponse
 import com.raghav.spacedawn.models.spaceflightapi.ArticlesResponse
+import com.raghav.spacedawn.models.spaceflightapi.ArticlesResponseItem
 import com.raghav.spacedawn.repository.AppRepository
 import com.raghav.spacedawn.utils.Resource
 import dagger.hilt.android.lifecycle.HiltViewModel
-import dagger.hilt.android.qualifiers.ApplicationContext
+import kotlinx.coroutines.flow.*
 import kotlinx.coroutines.launch
 import retrofit2.Response
-import java.io.IOException
 import javax.inject.Inject
 
 @SuppressLint("StaticFieldLeak")
 @HiltViewModel
 class AppViewModel @Inject constructor(
-    @ApplicationContext private val appContext: Context,
     private val repository: AppRepository
 ) : ViewModel() {
 
-    val articlesList: MutableLiveData<Resource<ArticlesResponse>> = MutableLiveData()
-    var articlesResponse: ArticlesResponse? = null
+    private val _articlesFlow =
+        MutableStateFlow<Resource<List<ArticlesResponseItem>>>(Resource.Loading())
+    val articlesFlow = _articlesFlow.asStateFlow()
+
+    var articlesList: MutableList<ArticlesResponseItem>? = null
     var skipArticle = 0
 
     val searchArticleList: MutableLiveData<Resource<ArticlesResponse>> = MutableLiveData()
@@ -40,71 +39,91 @@ class AppViewModel @Inject constructor(
 
     init {
         getArticlesList()
-        getLaunchesList()
+        //getLaunchesList()
     }
 
-    fun getArticlesList() = viewModelScope.launch {
-        safeGetArticleApiCall()
+    fun getArticlesList() {
+        viewModelScope.launch {
+            _articlesFlow.emit(Resource.Loading())
+            repository.getArticles(skipArticle)
+                .catch {
+                    _articlesFlow.emit(Resource.Error("Error Occurred: ${it.localizedMessage}"))
+                }
+                .collect {
+                    skipArticle += 10
+                    if (articlesList.isNullOrEmpty()) {
+                        articlesList = it.toMutableList()
+                    } else {
+                        articlesList?.addAll(it.toMutableList())
+                    }
+                    _articlesFlow.emit(Resource.Success(articlesList?.toList() ?: emptyList()))
+                }
+        }
     }
 
     fun getSearchArticleList(searchQuery: String) = viewModelScope.launch {
-        safeSearchArticleApiCall(searchQuery)
+        //safeSearchArticleApiCall(searchQuery)
     }
 
     fun getLaunchesList() = viewModelScope.launch {
-        safeGetLauchesApiCall()
+        //safeGetLauchesApiCall()
     }
 
-    private suspend fun safeSearchArticleApiCall(searchQuery: String) {
-        try {
-            if (hasInternetConnection()) {
-                searchArticleList.postValue(Resource.Loading())
-                val response = repository.searchArticle(searchQuery, skipSearchArticle)
-                searchArticleList.postValue(handleSearchResponse(response))
-            } else {
-                searchArticleList.postValue(Resource.Error("No Internet Connection"))
-            }
-        } catch (t: Throwable) {
-            when (t) {
-                is IOException -> searchArticleList.postValue(Resource.Error("Network Failure"))
-                else -> searchArticleList.postValue(Resource.Error("Conversion Error"))
-            }
-        }
-    }
+//    private suspend fun safeSearchArticleApiCall(searchQuery: String) {
+//        try {
+//            if (hasInternetConnection()) {
+//                searchArticleList.postValue(Resource.Loading())
+//                val response = repository.searchArticle(searchQuery, skipSearchArticle)
+//                searchArticleList.postValue(handleSearchResponse(response))
+//            } else {
+//                searchArticleList.postValue(Resource.Error("No Internet Connection"))
+//            }
+//        } catch (t: Throwable) {
+//            when (t) {
+//                is IOException -> searchArticleList.postValue(Resource.Error("Network Failure"))
+//                else -> searchArticleList.postValue(Resource.Error("Conversion Error"))
+//            }
+//        }
+//    }
 
-    private suspend fun safeGetArticleApiCall() {
-        try {
-            if (hasInternetConnection()) {
-                articlesList.postValue(Resource.Loading())
-                val response = repository.getArticles(skipArticle)
-                articlesList.postValue(handleArticlesResponse(response))
-            } else {
-                articlesList.postValue(Resource.Error("No Internet Connection"))
-            }
-        } catch (t: Throwable) {
-            when (t) {
-                is IOException -> articlesList.postValue(Resource.Error("Network Failure"))
-                else -> articlesList.postValue(Resource.Error("Conversion Error"))
-            }
-        }
-    }
+//    private suspend fun safeGetArticleApiCall() {
+//        try {
+//            val response = repository.getArticles(skipArticle)
+//            response.let {
+//                skipArticle += 10
+//                if (articlesResponse == null) {
+//                    articlesResponse = it
+//                } else {
+//                    val oldArticles = articlesResponse?.list
+//                    val newArticles = it.list ?: emptyList()
+//                    oldArticles?.addAll(newArticles)
+//                }
+//                articlesList.postValue(Resource.Success(articlesResponse ?: it))
+//            }
+//        } catch (t: Throwable) {
+//            when (t) {
+//                is IOException -> articlesList.postValue(Resource.Error("Network Failure"))
+//                else -> articlesList.postValue(Resource.Error("Conversion Error"))
+//            }
+//        }
+//    }
 
-    private suspend fun safeGetLauchesApiCall() {
-        try {
-            if (hasInternetConnection()) {
-                launchesList.postValue(Resource.Loading())
-                val response = repository.getLaunches(skipLaunches)
-                launchesList.postValue(handleLaunchesResponse(response))
-            } else {
-                launchesList.postValue(Resource.Error("No Internet Connection"))
-            }
-        } catch (t: Throwable) {
-            when (t) {
-                is IOException -> articlesList.postValue(Resource.Error("Network Failure"))
-                else -> articlesList.postValue(Resource.Error("Conversion Error"))
-            }
-        }
-    }
+//    private suspend fun safeGetLauchesApiCall() {
+//        try {
+//            if (hasInternetConnection()) {
+//                launchesList.postValue(Resource.Loading())
+//                val response = repository.getLaunches(skipLaunches)
+//                launchesList.postValue(handleLaunchesResponse(response))
+//            } else {
+//                launchesList.postValue(Resource.Error("No Internet Connection"))
+//            }
+//        } catch (t: Throwable) {
+//            when (t) {
+//                is IOException -> articlesList.postValue(Resource.Error("Network Failure"))
+//                else -> articlesList.postValue(Resource.Error("Conversion Error"))
+//            }
+//        }
+//    }
 
     private fun handleLaunchesResponse(response: Response<LaunchLibraryResponse>): Resource<LaunchLibraryResponse>? {
         if (response.isSuccessful) {
@@ -123,39 +142,22 @@ class AppViewModel @Inject constructor(
         return Resource.Error(response.message())
     }
 
-    private fun handleArticlesResponse(response: Response<ArticlesResponse>): Resource<ArticlesResponse> {
-        if (response.isSuccessful) {
-            response.body()?.let {
-                skipArticle += 10
-                if (articlesResponse == null) {
-                    articlesResponse = it
-                } else {
-                    val oldArticles = articlesResponse
-                    val newArticles = it
-                    oldArticles?.addAll(newArticles)
-                }
-                return Resource.Success(articlesResponse ?: it)
-            }
-        }
-        return Resource.Error(response.message())
-    }
-
-    private fun handleSearchResponse(response: Response<ArticlesResponse>): Resource<ArticlesResponse> {
-        if (response.isSuccessful) {
-            response.body()?.let {
-                skipSearchArticle += 10
-                if (searchArticleResponse == null) {
-                    searchArticleResponse = it
-                } else {
-                    val oldArticles = searchArticleResponse
-                    val newArticles = it
-                    oldArticles?.addAll(newArticles)
-                }
-                return Resource.Success(searchArticleResponse ?: it)
-            }
-        }
-        return Resource.Error(response.message())
-    }
+//    private fun handleSearchResponse(response: Response<ArticlesResponse>): Resource<ArticlesResponse> {
+//        if (response.isSuccessful) {
+//            response.body()?.let {
+//                skipSearchArticle += 10
+//                if (searchArticleResponse == null) {
+//                    searchArticleResponse = it
+//                } else {
+//                    val oldArticles = searchArticleResponse?.list
+//                    val newArticles = it.list ?: emptyList()
+//                    oldArticles?.addAll(newArticles)
+//                }
+//                return Resource.Success(searchArticleResponse ?: it)
+//            }
+//        }
+//        return Resource.Error(response.message())
+//    }
 
     fun saveReminder(reminder: ReminderModelClass) = viewModelScope.launch {
         repository.insert(reminder)
@@ -167,20 +169,5 @@ class AppViewModel @Inject constructor(
 
     fun deleteReminder(reminder: ReminderModelClass) = viewModelScope.launch {
         repository.deleteReminder(reminder)
-    }
-
-    private fun hasInternetConnection(): Boolean {
-        val connectivityManager = appContext.getSystemService(
-            Context.CONNECTIVITY_SERVICE
-        ) as ConnectivityManager
-
-        val activeNetwork = connectivityManager.activeNetwork ?: return false
-        val capabilities = connectivityManager.getNetworkCapabilities(activeNetwork) ?: return false
-        return when {
-            capabilities.hasTransport(NetworkCapabilities.TRANSPORT_WIFI) -> true
-            capabilities.hasTransport(NetworkCapabilities.TRANSPORT_CELLULAR) -> true
-            capabilities.hasTransport(NetworkCapabilities.TRANSPORT_ETHERNET) -> true
-            else -> false
-        }
     }
 }
