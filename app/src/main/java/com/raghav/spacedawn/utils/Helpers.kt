@@ -24,6 +24,11 @@ class Helpers {
             return formatter.format(this)
         }
 
+        /**
+         * Returns true if the Internet Connection (both cellular or wifi)
+         * is available otherwise false
+         * */
+
         fun Context.isConnectedToNetwork(): Boolean {
             // register activity with the connectivity manager service
             val connectivityManager =

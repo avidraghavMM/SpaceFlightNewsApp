@@ -2,6 +2,7 @@ package com.raghav.spacedawn.db
 
 import androidx.room.Database
 import androidx.room.RoomDatabase
+import com.raghav.spacedawn.models.reminder.ReminderModelClass
 import com.raghav.spacedawn.models.spaceflightapi.ArticlesResponseItem
 
 @Database(

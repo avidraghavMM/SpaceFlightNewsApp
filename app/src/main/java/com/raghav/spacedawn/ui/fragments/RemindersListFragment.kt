@@ -15,7 +15,7 @@ import androidx.recyclerview.widget.LinearLayoutManager
 import com.raghav.spacedawn.R
 import com.raghav.spacedawn.adapters.RemindersListAdapter
 import com.raghav.spacedawn.databinding.FragmentRemindersListBinding
-import com.raghav.spacedawn.db.ReminderModelClass
+import com.raghav.spacedawn.models.reminder.ReminderModelClass
 import com.raghav.spacedawn.ui.AppViewModel
 import com.raghav.spacedawn.utils.AlarmBroadCastReciever
 import dagger.hilt.android.AndroidEntryPoint

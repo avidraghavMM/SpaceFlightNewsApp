@@ -18,8 +18,8 @@ import androidx.recyclerview.widget.RecyclerView
 import com.raghav.spacedawn.R
 import com.raghav.spacedawn.adapters.LaunchesAdapter
 import com.raghav.spacedawn.databinding.FragmentLaunchesListBinding
-import com.raghav.spacedawn.db.ReminderModelClass
 import com.raghav.spacedawn.models.launchlibrary.LaunchLibraryResponseItem
+import com.raghav.spacedawn.models.reminder.ReminderModelClass
 import com.raghav.spacedawn.ui.AppViewModel
 import com.raghav.spacedawn.utils.AlarmBroadCastReciever
 import com.raghav.spacedawn.utils.Constants
@@ -70,7 +70,6 @@ class LaunchesListFragment : Fragment(R.layout.fragment_launches_list) {
                 when (response) {
                     is Resource.Loading -> {
                         showProgressBar()
-                        Log.e("inside loading", "")
                     }
                     is Resource.Success -> {
                         hideProgressBar()
@@ -92,7 +91,6 @@ class LaunchesListFragment : Fragment(R.layout.fragment_launches_list) {
                                 .show()
                             showErrorMessage(message)
                         }
-                        Log.e("inside error", "")
                     }
                 }
             }
