@@ -1,7 +1,6 @@
 package com.raghav.spacedawn.ui.viewmodels
 
 import android.util.Log
-import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.raghav.spacedawn.models.spaceflightapi.ArticlesResponseItem
 import com.raghav.spacedawn.repository.AppRepository
@@ -17,7 +16,7 @@ import javax.inject.Inject
 @HiltViewModel
 class ArticlesListFragmentVM @Inject constructor(
     private val repository: AppRepository
-) : ViewModel() {
+) : BaseViewModel() {
 
     private val _articlesFlow =
         MutableStateFlow<Resource<List<ArticlesResponseItem>>>(Resource.Loading())
@@ -29,7 +28,8 @@ class ArticlesListFragmentVM @Inject constructor(
     }
 
     fun getArticlesList() {
-        viewModelScope.launch {
+        job?.cancel()
+        job = viewModelScope.launch {
             _articlesFlow.emit(Resource.Loading())
             repository.getArticles(skipArticle)
                 .catch {
