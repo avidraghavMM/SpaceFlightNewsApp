@@ -13,7 +13,7 @@ interface SpaceFlightDao {
     @Insert(onConflict = OnConflictStrategy.REPLACE)
     suspend fun saveArticles(articles: List<ArticlesResponseItem>)
 
-    @Query("SELECT * from articles")
+    @Query("SELECT * from articles ORDER by publishedAt DESC")
     fun getArticles(): Flow<List<ArticlesResponseItem>>
 
     @Query("DELETE from articles")
