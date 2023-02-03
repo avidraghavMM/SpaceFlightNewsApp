@@ -15,7 +15,7 @@ import androidx.recyclerview.widget.RecyclerView
 import com.raghav.spacedawn.R
 import com.raghav.spacedawn.adapters.ArticlesAdapter
 import com.raghav.spacedawn.databinding.FragmentSearchArticleBinding
-import com.raghav.spacedawn.ui.AppViewModel
+import com.raghav.spacedawn.ui.viewmodels.SearchArticleFragmentVM
 import com.raghav.spacedawn.utils.Constants
 import com.raghav.spacedawn.utils.Constants.Companion.DELAY_TIME
 import com.raghav.spacedawn.utils.Resource
@@ -28,8 +28,8 @@ import kotlinx.coroutines.launch
 @AndroidEntryPoint
 class SearchArticleFragment : Fragment(R.layout.fragment_search_article) {
 
-    private val viewModel by viewModels<AppViewModel>()
-    lateinit var articlesAdapter: ArticlesAdapter
+    private val viewModel by viewModels<SearchArticleFragmentVM>()
+    private lateinit var articlesAdapter: ArticlesAdapter
     private lateinit var binding: FragmentSearchArticleBinding
     private val TAG = "SearchArticleFragment"
 

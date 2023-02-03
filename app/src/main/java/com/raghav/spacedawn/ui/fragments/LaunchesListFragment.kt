@@ -18,7 +18,7 @@ import com.raghav.spacedawn.adapters.LaunchesAdapter
 import com.raghav.spacedawn.databinding.FragmentLaunchesListBinding
 import com.raghav.spacedawn.models.launchlibrary.LaunchLibraryResponseItem
 import com.raghav.spacedawn.models.reminder.ReminderModelClass
-import com.raghav.spacedawn.ui.AppViewModel
+import com.raghav.spacedawn.ui.viewmodels.LaunchesListFragmentVM
 import com.raghav.spacedawn.utils.AlarmBroadCastReciever
 import com.raghav.spacedawn.utils.Constants
 import com.raghav.spacedawn.utils.Constants.Companion.MinutestoMiliseconds
@@ -36,8 +36,8 @@ import kotlinx.coroutines.withContext
 @AndroidEntryPoint
 class LaunchesListFragment : Fragment(R.layout.fragment_launches_list) {
 
-    private val viewModel by viewModels<AppViewModel>()
-    lateinit var launchesAdapter: LaunchesAdapter
+    private val viewModel by viewModels<LaunchesListFragmentVM>()
+    private lateinit var launchesAdapter: LaunchesAdapter
     private lateinit var binding: FragmentLaunchesListBinding
     private val TAG = "LaunchesListFragment"
 
@@ -113,7 +113,7 @@ class LaunchesListFragment : Fragment(R.layout.fragment_launches_list) {
             activity,
             pendingIntentId,
             i,
-            PendingIntent.FLAG_CANCEL_CURRENT
+            PendingIntent.FLAG_CANCEL_CURRENT or PendingIntent.FLAG_IMMUTABLE
         )
 
         val reminder = ReminderModelClass(
