@@ -1,6 +1,5 @@
 package com.raghav.spacedawn.ui.viewmodels
 
-import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.raghav.spacedawn.models.launchlibrary.LaunchLibraryResponseItem
 import com.raghav.spacedawn.models.reminder.ReminderModelClass
@@ -16,7 +15,7 @@ import javax.inject.Inject
 @HiltViewModel
 class LaunchesListFragmentVM @Inject constructor(
     private val repository: AppRepository
-) : ViewModel() {
+) : BaseViewModel() {
 
     private val _launchesFlow =
         MutableStateFlow<Resource<List<LaunchLibraryResponseItem>>>(Resource.Loading())
