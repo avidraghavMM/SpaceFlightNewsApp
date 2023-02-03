@@ -1,11 +1,13 @@
 package com.raghav.spacedawn.ui
 
+import android.util.Log
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.raghav.spacedawn.models.launchlibrary.LaunchLibraryResponseItem
 import com.raghav.spacedawn.models.reminder.ReminderModelClass
 import com.raghav.spacedawn.models.spaceflightapi.ArticlesResponseItem
 import com.raghav.spacedawn.repository.AppRepository
+import com.raghav.spacedawn.ui.fragments.ArticlesListFragment
 import com.raghav.spacedawn.utils.Resource
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -22,19 +24,16 @@ class AppViewModel @Inject constructor(
     private val _articlesFlow =
         MutableStateFlow<Resource<List<ArticlesResponseItem>>>(Resource.Loading())
     val articlesFlow = _articlesFlow.asStateFlow()
-    private var articlesList: MutableList<ArticlesResponseItem>? = null
     private var skipArticle = 0
 
     private val _searchArticlesFlow =
         MutableStateFlow<Resource<List<ArticlesResponseItem>>>(Resource.Success(emptyList()))
     val searchArticlesFlow = _searchArticlesFlow.asStateFlow()
     private var skipSearchArticle = 0
-    var searchArticleList: MutableList<ArticlesResponseItem>? = null
 
     private val _launchesFlow =
         MutableStateFlow<Resource<List<LaunchLibraryResponseItem>>>(Resource.Loading())
     val launchesFlow = _launchesFlow.asStateFlow()
-    private var launchesList: MutableList<LaunchLibraryResponseItem>? = null
     private var skipLaunches = 0
 
     init {
@@ -49,14 +48,10 @@ class AppViewModel @Inject constructor(
                 .catch {
                     _articlesFlow.emit(Resource.Error("Error Occurred: ${it.localizedMessage}"))
                 }
-                .collect {
+                .collect { articlesList ->
+                    Log.d(ArticlesListFragment.TAG, "vm-collector-triggered")
                     skipArticle += 10
-                    if (articlesList.isNullOrEmpty()) {
-                        articlesList = it.toMutableList()
-                    } else {
-                        articlesList?.addAll(it.toMutableList())
-                    }
-                    _articlesFlow.emit(Resource.Success(articlesList?.toList() ?: emptyList()))
+                    _articlesFlow.emit(Resource.Success(articlesList))
                 }
         }
     }
@@ -66,19 +61,10 @@ class AppViewModel @Inject constructor(
             .catch {
                 _searchArticlesFlow.emit(Resource.Error("Error Occurred: ${it.localizedMessage}"))
             }
-            .collect {
+            .collect { searchArticlesList ->
                 skipSearchArticle += 10
-                if (searchArticleList == null) {
-                    searchArticleList = it.toMutableList()
-                } else {
-                    val oldArticles = searchArticleList
-                    val newArticles = it.toMutableList()
-                    oldArticles?.addAll(newArticles)
-                }
                 _searchArticlesFlow.emit(
-                    Resource.Success(
-                        searchArticleList?.toList() ?: emptyList()
-                    )
+                    Resource.Success(searchArticlesList)
                 )
             }
     }
@@ -88,16 +74,9 @@ class AppViewModel @Inject constructor(
             .catch {
                 _launchesFlow.emit(Resource.Error("Error Occurred: ${it.localizedMessage}"))
             }
-            .collect {
+            .collect { launchesList ->
                 skipLaunches += 10
-                if (launchesList == null) {
-                    launchesList = it.toMutableList()
-                } else {
-                    val oldArticles = launchesList
-                    val newArticles = it.toMutableList()
-                    oldArticles?.addAll(newArticles)
-                }
-                _launchesFlow.emit(Resource.Success(launchesList?.toList() ?: emptyList()))
+                _launchesFlow.emit(Resource.Success(launchesList))
             }
     }
 

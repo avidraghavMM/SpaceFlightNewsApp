@@ -25,7 +25,10 @@ class ArticlesListFragment : Fragment(R.layout.fragment_articles_list) {
     private val viewModel by viewModels<AppViewModel>()
     lateinit var articlesAdapter: ArticlesAdapter
     private lateinit var binding: FragmentArticlesListBinding
-    private val TAG = "ArticlesListFragment"
+
+    companion object {
+        const val TAG = "ArticlesListFragment"
+    }
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
@@ -34,16 +37,17 @@ class ArticlesListFragment : Fragment(R.layout.fragment_articles_list) {
 
         viewLifecycleOwner.lifecycleScope.launchWhenStarted {
             viewModel.articlesFlow.collect {
+                Log.d(TAG, "ui-collector-triggered for $it")
                 when (it) {
                     is Resource.Error -> {
                         hideProgressBar()
-                        Log.d(TAG, "inside failure")
                         Toast.makeText(
                             requireContext(),
                             "An error occurred: ${it.message}",
                             Toast.LENGTH_LONG
                         ).show()
                         showErrorMessage(it.message.orEmpty())
+                        Log.d(TAG, "size-" + it.message.toString())
                     }
                     is Resource.Loading -> {
                         showProgressBar()
@@ -51,6 +55,11 @@ class ArticlesListFragment : Fragment(R.layout.fragment_articles_list) {
                     is Resource.Success -> {
                         hideProgressBar()
                         hideErrorMessage()
+
+                        Log.d(TAG, "size-" + it.data?.size.toString())
+                        it.data?.forEach { item ->
+                            Log.d(TAG, item.id.toString())
+                        }
                         if (it.data?.isEmpty() == true)
                             showErrorMessage("Connect To Internet")
                         else
