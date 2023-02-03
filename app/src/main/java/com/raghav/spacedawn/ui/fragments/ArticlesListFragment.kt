@@ -14,7 +14,7 @@ import androidx.recyclerview.widget.RecyclerView
 import com.raghav.spacedawn.R
 import com.raghav.spacedawn.adapters.ArticlesAdapter
 import com.raghav.spacedawn.databinding.FragmentArticlesListBinding
-import com.raghav.spacedawn.ui.AppViewModel
+import com.raghav.spacedawn.ui.viewmodels.ArticlesListFragmentVM
 import com.raghav.spacedawn.utils.Constants.Companion.QUERY_PAGE_SIZE
 import com.raghav.spacedawn.utils.Resource
 import dagger.hilt.android.AndroidEntryPoint
@@ -22,8 +22,8 @@ import dagger.hilt.android.AndroidEntryPoint
 @AndroidEntryPoint
 class ArticlesListFragment : Fragment(R.layout.fragment_articles_list) {
 
-    private val viewModel by viewModels<AppViewModel>()
-    lateinit var articlesAdapter: ArticlesAdapter
+    private val viewModel by viewModels<ArticlesListFragmentVM>()
+    private lateinit var articlesAdapter: ArticlesAdapter
     private lateinit var binding: FragmentArticlesListBinding
 
     companion object {
