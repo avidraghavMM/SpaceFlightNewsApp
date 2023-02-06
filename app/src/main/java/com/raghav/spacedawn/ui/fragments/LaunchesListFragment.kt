@@ -152,8 +152,12 @@ class LaunchesListFragment : Fragment(R.layout.fragment_launches_list) {
         }
         binding.rvArticles.apply {
             adapter = launchesAdapter.withLoadStateHeaderAndFooter(
-                header = LoaderAdapter(),
-                footer = LoaderAdapter()
+                header = LoaderAdapter {
+                    launchesAdapter.refresh()
+                },
+                footer = LoaderAdapter {
+                    launchesAdapter.refresh()
+                }
             )
             layoutManager = LinearLayoutManager(activity)
             setHasFixedSize(true)
