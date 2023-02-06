@@ -24,7 +24,7 @@ class LaunchesListFragmentVM @Inject constructor(
         getLaunchesList()
     }
 
-    fun getLaunchesList() {
+    private fun getLaunchesList() {
         _launchesList = repository.getLaunches().cachedIn(viewModelScope)
     }
 
