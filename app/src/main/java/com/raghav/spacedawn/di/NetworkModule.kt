@@ -2,7 +2,6 @@ package com.raghav.spacedawn.di
 
 import com.raghav.spacedawn.network.LaunchLibrary
 import com.raghav.spacedawn.network.SpaceFlightAPI
-import com.raghav.spacedawn.paging.LaunchesPagingSource
 import com.raghav.spacedawn.utils.AppApplication
 import com.raghav.spacedawn.utils.Constants
 import dagger.Module
@@ -61,9 +60,4 @@ object NetworkModule {
     ): LaunchLibrary {
         return retrofit.create(LaunchLibrary::class.java)
     }
-
-    @Singleton
-    @Provides
-    fun provideLaunchesPagingSource(launchLibrary: LaunchLibrary) =
-        LaunchesPagingSource(launchLibrary)
 }

@@ -10,6 +10,7 @@ import android.widget.Toast
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.viewModels
 import androidx.lifecycle.lifecycleScope
+import androidx.paging.LoadState
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.raghav.spacedawn.R
 import com.raghav.spacedawn.adapters.LaunchesAdapter
@@ -38,7 +39,7 @@ class LaunchesListFragment : Fragment(R.layout.fragment_launches_list) {
     private lateinit var binding: FragmentLaunchesListBinding
 
     companion object {
-        val TAG = "LaunchesListFragment"
+        private const val TAG = "LaunchesListFragment"
     }
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
@@ -70,7 +71,7 @@ class LaunchesListFragment : Fragment(R.layout.fragment_launches_list) {
         }
 
         binding.btnRetry.setOnClickListener {
-            viewModel.getLaunchesList()
+            launchesAdapter.refresh()
         }
     }
 
@@ -114,29 +115,41 @@ class LaunchesListFragment : Fragment(R.layout.fragment_launches_list) {
         ).show()
     }
 
-//    private fun hideProgressBar() {
-//        binding.paginationProgressBar.visibility = View.INVISIBLE
-//        isLoading = false
-//    }
-//
-//    private fun showProgressBar() {
-//        binding.paginationProgressBar.visibility = View.VISIBLE
-//        isLoading = true
-//    }
-//
-//    private fun hideErrorMessage() {
-//        binding.itemErrorMessage.visibility = View.INVISIBLE
-//        isError = false
-//    }
-//
-//    private fun showErrorMessage(message: String) {
-//        binding.itemErrorMessage.visibility = View.VISIBLE
-//        binding.tvErrorMessage.text = message
-//        isError = true
-//    }
+    private fun hideProgressBar() {
+        binding.paginationProgressBar.visibility = View.INVISIBLE
+    }
+
+    private fun showProgressBar() {
+        binding.paginationProgressBar.visibility = View.VISIBLE
+    }
+
+    private fun hideErrorMessage() {
+        binding.itemErrorMessage.visibility = View.INVISIBLE
+    }
+
+    private fun showErrorMessage(message: String) {
+        binding.itemErrorMessage.visibility = View.VISIBLE
+        binding.tvErrorMessage.text = message
+    }
 
     private fun setupRecyclerView() {
         launchesAdapter = LaunchesAdapter()
+        launchesAdapter.addLoadStateListener {
+            when (it.refresh) {
+                LoadState.Loading -> {
+                    showProgressBar()
+                    hideErrorMessage()
+                }
+                is LoadState.Error -> {
+                    hideProgressBar()
+                    showErrorMessage("Some Error Occured")
+                }
+                else -> {
+                    hideProgressBar()
+                    hideErrorMessage()
+                }
+            }
+        }
         binding.rvArticles.apply {
             adapter = launchesAdapter.withLoadStateHeaderAndFooter(
                 header = LoaderAdapter(),

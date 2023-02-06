@@ -24,9 +24,8 @@ class AppRepository @Inject constructor(
     private val reminderDao: ReminderDao,
     private val spaceFlightDao: SpaceFlightDao,
     private val spaceFlightApi: SpaceFlightAPI,
-    private val launchLibraryApi: LaunchLibrary,
-    private val launchLibraryDao: LaunchLibraryDao,
-    private val launchesPagingSource: LaunchesPagingSource
+    private val launchLibrary: LaunchLibrary,
+    private val launchLibraryDao: LaunchLibraryDao
 ) {
 
     /**
@@ -68,7 +67,7 @@ class AppRepository @Inject constructor(
     fun getLaunches(): Flow<PagingData<LaunchLibraryResponseItem>> {
         return Pager(
             config = PagingConfig(pageSize = 10, maxSize = 30),
-            pagingSourceFactory = { launchesPagingSource }
+            pagingSourceFactory = { LaunchesPagingSource(launchLibrary) }
         ).flow
     }
 
