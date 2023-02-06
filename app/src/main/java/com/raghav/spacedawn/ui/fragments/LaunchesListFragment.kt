@@ -14,10 +14,10 @@ import androidx.paging.LoadState
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.raghav.spacedawn.R
 import com.raghav.spacedawn.adapters.LaunchesAdapter
-import com.raghav.spacedawn.adapters.LoaderAdapter
 import com.raghav.spacedawn.databinding.FragmentLaunchesListBinding
 import com.raghav.spacedawn.models.launchlibrary.LaunchLibraryResponseItem
 import com.raghav.spacedawn.models.reminder.ReminderModelClass
+import com.raghav.spacedawn.paging.LoaderAdapter
 import com.raghav.spacedawn.ui.viewmodels.LaunchesListFragmentVM
 import com.raghav.spacedawn.utils.AlarmBroadCastReciever
 import com.raghav.spacedawn.utils.Constants
@@ -142,7 +142,7 @@ class LaunchesListFragment : Fragment(R.layout.fragment_launches_list) {
                 }
                 is LoadState.Error -> {
                     hideProgressBar()
-                    showErrorMessage("Some Error Occured")
+                    showErrorMessage("Some Error Occurred")
                 }
                 else -> {
                     hideProgressBar()

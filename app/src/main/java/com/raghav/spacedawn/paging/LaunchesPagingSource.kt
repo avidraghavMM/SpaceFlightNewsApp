@@ -28,7 +28,7 @@ class LaunchesPagingSource @Inject constructor(private val launchLibrary: Launch
             val response = launchLibrary.getLaunches(position)
             LoadResult.Page(
                 data = response.results,
-                prevKey = if (position == 0) null else position + Constants.LAUNCHES_INCREMENT,
+                prevKey = if (position == 0) null else position - Constants.LAUNCHES_INCREMENT,
                 nextKey = position + Constants.LAUNCHES_INCREMENT
             )
         } catch (e: Exception) {
