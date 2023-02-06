@@ -5,5 +5,7 @@
     <string name="open">Open</string>
     <string name="close">Close</string>
     <string name="ist">IST</string>
+    <string name="failed_to_connect">Failed to connect</string>
+    <string name="retry">Retry</string>
 
 </resources>

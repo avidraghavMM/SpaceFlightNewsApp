@@ -6,11 +6,9 @@ import androidx.paging.cachedIn
 import com.raghav.spacedawn.models.launchlibrary.LaunchLibraryResponseItem
 import com.raghav.spacedawn.models.reminder.ReminderModelClass
 import com.raghav.spacedawn.repository.AppRepository
-import com.raghav.spacedawn.utils.Resource
 import dagger.hilt.android.lifecycle.HiltViewModel
-import kotlinx.coroutines.flow.MutableStateFlow
-import kotlinx.coroutines.flow.asStateFlow
-import kotlinx.coroutines.flow.catch
+import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.emptyFlow
 import kotlinx.coroutines.launch
 import javax.inject.Inject
 
@@ -19,36 +17,20 @@ class LaunchesListFragmentVM @Inject constructor(
     private val repository: AppRepository
 ) : BaseViewModel() {
 
-    private val _launchesFlow =
-        MutableStateFlow<Resource<PagingData<LaunchLibraryResponseItem>>>(Resource.Loading())
-    val launchesFlow = _launchesFlow.asStateFlow()
-    //private var skipLaunches = 0
+    private var _launchesList: Flow<PagingData<LaunchLibraryResponseItem>> = emptyFlow()
+    val launchesList: Flow<PagingData<LaunchLibraryResponseItem>> get() = _launchesList
 
     init {
         getLaunchesList()
     }
 
-    fun getLaunchesList() = viewModelScope.launch {
-        _launchesFlow.emit(Resource.Loading())
-        repository.getLaunches()
-            .cachedIn(this)
-            .catch {
-                _launchesFlow.emit(Resource.Error("Error Occurred: ${it.localizedMessage}"))
-            }.collect { data ->
-//                skipLaunches += 10
-                _launchesFlow.emit(Resource.Success(data))
-            }
+    fun getLaunchesList() {
+        _launchesList = repository.getLaunches().cachedIn(viewModelScope)
     }
 
     fun saveReminder(reminder: ReminderModelClass) = viewModelScope.launch {
         repository.insert(reminder)
     }
 
-    fun getReminders() = repository.getAllReminders()
-
     fun getLaunchId(id: String) = repository.getId(id)
-
-    fun deleteReminder(reminder: ReminderModelClass) = viewModelScope.launch {
-        repository.deleteReminder(reminder)
-    }
 }
