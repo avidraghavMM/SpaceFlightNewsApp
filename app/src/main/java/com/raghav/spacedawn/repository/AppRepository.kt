@@ -1,6 +1,9 @@
 package com.raghav.spacedawn.repository
 
 import android.content.Context
+import androidx.paging.Pager
+import androidx.paging.PagingConfig
+import androidx.paging.PagingData
 import com.raghav.spacedawn.db.LaunchLibraryDao
 import com.raghav.spacedawn.db.ReminderDao
 import com.raghav.spacedawn.db.SpaceFlightDao
@@ -9,6 +12,7 @@ import com.raghav.spacedawn.models.reminder.ReminderModelClass
 import com.raghav.spacedawn.models.spaceflightapi.ArticlesResponseItem
 import com.raghav.spacedawn.network.LaunchLibrary
 import com.raghav.spacedawn.network.SpaceFlightAPI
+import com.raghav.spacedawn.paging.LaunchesPagingSource
 import com.raghav.spacedawn.utils.Helpers.Companion.isConnectedToNetwork
 import dagger.hilt.android.qualifiers.ApplicationContext
 import kotlinx.coroutines.flow.Flow
@@ -21,7 +25,8 @@ class AppRepository @Inject constructor(
     private val spaceFlightDao: SpaceFlightDao,
     private val spaceFlightApi: SpaceFlightAPI,
     private val launchLibraryApi: LaunchLibrary,
-    private val launchLibraryDao: LaunchLibraryDao
+    private val launchLibraryDao: LaunchLibraryDao,
+    private val launchesPagingSource: LaunchesPagingSource
 ) {
 
     /**
@@ -53,11 +58,18 @@ class AppRepository @Inject constructor(
      * in database if Internet connection available.
      * In case there is no data in database an empty list is returned
      * */
-    suspend fun getLaunches(skipLaunches: Int): Flow<List<LaunchLibraryResponseItem>> {
-        if (appContext.isConnectedToNetwork()) {
-            launchLibraryDao.saveLaunches(launchLibraryApi.getLaunches(skipLaunches).results)
-        }
-        return launchLibraryDao.getLaunches()
+//    suspend fun getLaunches(skipLaunches: Int): Flow<List<LaunchLibraryResponseItem>> {
+//        if (appContext.isConnectedToNetwork()) {
+//            launchLibraryDao.saveLaunches(launchLibraryApi.getLaunches(skipLaunches).results)
+//        }
+//        return launchLibraryDao.getLaunches()
+//    }
+
+    fun getLaunches(): Flow<PagingData<LaunchLibraryResponseItem>> {
+        return Pager(
+            config = PagingConfig(pageSize = 10, maxSize = 30),
+            pagingSourceFactory = { launchesPagingSource }
+        ).flow
     }
 
     suspend fun insert(reminder: ReminderModelClass) = reminderDao.saveReminder(reminder)

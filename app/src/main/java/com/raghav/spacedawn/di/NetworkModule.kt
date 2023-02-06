@@ -2,6 +2,8 @@ package com.raghav.spacedawn.di
 
 import com.raghav.spacedawn.network.LaunchLibrary
 import com.raghav.spacedawn.network.SpaceFlightAPI
+import com.raghav.spacedawn.paging.LaunchesPagingSource
+import com.raghav.spacedawn.utils.AppApplication
 import com.raghav.spacedawn.utils.Constants
 import dagger.Module
 import dagger.Provides
@@ -44,8 +46,13 @@ object NetworkModule {
     @Provides
     @Named(Constants.LAUNCH_LIBRARY_API)
     fun provideRetrofitForLaunchApi(client: OkHttpClient): Retrofit =
-        Retrofit.Builder().baseUrl(Constants.BASE_URL_LAUNCHLIBRARY)
-            .addConverterFactory(GsonConverterFactory.create()).client(client).build()
+        Retrofit.Builder()
+            .baseUrl(AppApplication.INSTANCE.getLaunchLibraryBaseUrl())
+            .addConverterFactory(
+                GsonConverterFactory
+                    .create()
+            )
+            .client(client).build()
 
     @Singleton
     @Provides
@@ -54,4 +61,9 @@ object NetworkModule {
     ): LaunchLibrary {
         return retrofit.create(LaunchLibrary::class.java)
     }
+
+    @Singleton
+    @Provides
+    fun provideLaunchesPagingSource(launchLibrary: LaunchLibrary) =
+        LaunchesPagingSource(launchLibrary)
 }
