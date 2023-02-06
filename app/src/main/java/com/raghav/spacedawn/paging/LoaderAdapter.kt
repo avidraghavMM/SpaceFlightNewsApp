@@ -1,4 +1,4 @@
-package com.raghav.spacedawn.adapters
+package com.raghav.spacedawn.paging
 
 import android.view.LayoutInflater
 import android.view.View.GONE
