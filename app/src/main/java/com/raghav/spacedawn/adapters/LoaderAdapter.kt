@@ -1,14 +1,16 @@
 package com.raghav.spacedawn.adapters
 
 import android.view.LayoutInflater
-import android.view.View
+import android.view.View.GONE
+import android.view.View.VISIBLE
 import android.view.ViewGroup
 import androidx.paging.LoadState
 import androidx.paging.LoadStateAdapter
 import androidx.recyclerview.widget.RecyclerView
 import com.raghav.spacedawn.databinding.ItemLoadStateBinding
 
-class LoaderAdapter : LoadStateAdapter<LoaderAdapter.ViewHolder>() {
+class LoaderAdapter(private val retryListener: () -> Unit = {}) :
+    LoadStateAdapter<LoaderAdapter.ViewHolder>() {
 
     inner class ViewHolder(private val binding: ItemLoadStateBinding) :
         RecyclerView.ViewHolder(binding.root) {
@@ -16,13 +18,19 @@ class LoaderAdapter : LoadStateAdapter<LoaderAdapter.ViewHolder>() {
         fun bind(state: LoadState) {
             when (state) {
                 LoadState.Loading -> {
-                    binding.paginationProgressBar.visibility = View.VISIBLE
+                    binding.itemErrorMessage.visibility = GONE
+                    binding.paginationProgressBar.visibility = VISIBLE
                 }
                 is LoadState.Error -> {
-                    binding.itemErrorMessage.visibility = View.VISIBLE
+                    binding.paginationProgressBar.visibility = GONE
+                    binding.itemErrorMessage.visibility = VISIBLE
                     binding.tvErrorMessage.text = state.error.localizedMessage
                 }
                 else -> {}
+            }
+
+            binding.btnRetry.setOnClickListener {
+                retryListener()
             }
         }
     }
