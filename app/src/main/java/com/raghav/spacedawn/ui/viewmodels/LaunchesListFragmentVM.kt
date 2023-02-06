@@ -1,6 +1,8 @@
 package com.raghav.spacedawn.ui.viewmodels
 
 import androidx.lifecycle.viewModelScope
+import androidx.paging.PagingData
+import androidx.paging.cachedIn
 import com.raghav.spacedawn.models.launchlibrary.LaunchLibraryResponseItem
 import com.raghav.spacedawn.models.reminder.ReminderModelClass
 import com.raghav.spacedawn.repository.AppRepository
@@ -18,22 +20,23 @@ class LaunchesListFragmentVM @Inject constructor(
 ) : BaseViewModel() {
 
     private val _launchesFlow =
-        MutableStateFlow<Resource<List<LaunchLibraryResponseItem>>>(Resource.Loading())
+        MutableStateFlow<Resource<PagingData<LaunchLibraryResponseItem>>>(Resource.Loading())
     val launchesFlow = _launchesFlow.asStateFlow()
-    private var skipLaunches = 0
+    //private var skipLaunches = 0
 
     init {
         getLaunchesList()
     }
 
     fun getLaunchesList() = viewModelScope.launch {
-        repository.getLaunches(skipLaunches)
+        _launchesFlow.emit(Resource.Loading())
+        repository.getLaunches()
+            .cachedIn(this)
             .catch {
                 _launchesFlow.emit(Resource.Error("Error Occurred: ${it.localizedMessage}"))
-            }
-            .collect { launchesList ->
-                skipLaunches += 10
-                _launchesFlow.emit(Resource.Success(launchesList))
+            }.collect { data ->
+//                skipLaunches += 10
+                _launchesFlow.emit(Resource.Success(data))
             }
     }
 

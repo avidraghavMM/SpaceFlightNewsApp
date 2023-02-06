@@ -6,13 +6,11 @@ import android.content.Context
 import android.content.Intent
 import android.os.Bundle
 import android.view.View
-import android.widget.AbsListView
 import android.widget.Toast
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.viewModels
 import androidx.lifecycle.lifecycleScope
 import androidx.recyclerview.widget.LinearLayoutManager
-import androidx.recyclerview.widget.RecyclerView
 import com.raghav.spacedawn.R
 import com.raghav.spacedawn.adapters.LaunchesAdapter
 import com.raghav.spacedawn.databinding.FragmentLaunchesListBinding
@@ -22,7 +20,6 @@ import com.raghav.spacedawn.ui.viewmodels.LaunchesListFragmentVM
 import com.raghav.spacedawn.utils.AlarmBroadCastReciever
 import com.raghav.spacedawn.utils.Constants
 import com.raghav.spacedawn.utils.Constants.Companion.MinutestoMiliseconds
-import com.raghav.spacedawn.utils.Constants.Companion.QUERY_PAGE_SIZE
 import com.raghav.spacedawn.utils.Constants.Companion.STATUS_SET
 import com.raghav.spacedawn.utils.Helpers.Companion.formatTo
 import com.raghav.spacedawn.utils.Helpers.Companion.toDate
@@ -39,7 +36,10 @@ class LaunchesListFragment : Fragment(R.layout.fragment_launches_list) {
     private val viewModel by viewModels<LaunchesListFragmentVM>()
     private lateinit var launchesAdapter: LaunchesAdapter
     private lateinit var binding: FragmentLaunchesListBinding
-    private val TAG = "LaunchesListFragment"
+
+    companion object {
+        val TAG = "LaunchesListFragment"
+    }
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
@@ -65,10 +65,10 @@ class LaunchesListFragment : Fragment(R.layout.fragment_launches_list) {
                     is Resource.Success -> {
                         hideProgressBar()
                         hideErrorMessage()
-                        if (it.data?.isEmpty() == true)
+                        if (it.data == null)
                             showErrorMessage("Connect To Internet")
                         else
-                            launchesAdapter.differ.submitList(it.data)
+                            launchesAdapter.submitData(viewLifecycleOwner.lifecycle, it.data)
                     }
                 }
             }
@@ -161,43 +161,44 @@ class LaunchesListFragment : Fragment(R.layout.fragment_launches_list) {
     var isLastPage = false
     var isScrolling = false
 
-    val scrollListener = object : RecyclerView.OnScrollListener() {
-        override fun onScrolled(recyclerView: RecyclerView, dx: Int, dy: Int) {
-            super.onScrolled(recyclerView, dx, dy)
-
-            val layoutManager = recyclerView.layoutManager as LinearLayoutManager
-            val firstVisibleItemPosition = layoutManager.findFirstVisibleItemPosition()
-            val visibleItemCount = layoutManager.childCount
-            val totalItemCount = layoutManager.itemCount
-
-            val isNotLoadingAndNotLastPage = !isLoading && !isLastPage
-            val isAtLastItem = firstVisibleItemPosition + visibleItemCount >= totalItemCount
-            val isNotAtBeginning = firstVisibleItemPosition >= 0
-            val isTotalMoreThanVisible = totalItemCount >= QUERY_PAGE_SIZE
-            val shouldPaginate = isNotLoadingAndNotLastPage && isAtLastItem && isNotAtBeginning &&
-                    isTotalMoreThanVisible && isScrolling
-            if (shouldPaginate) {
-                viewModel.getLaunchesList()
-                isScrolling = false
-            } else {
-                binding.rvArticles.setPadding(0, 0, 0, 0)
-            }
-        }
-
-        override fun onScrollStateChanged(recyclerView: RecyclerView, newState: Int) {
-            super.onScrollStateChanged(recyclerView, newState)
-            if (newState == AbsListView.OnScrollListener.SCROLL_STATE_TOUCH_SCROLL) {
-                isScrolling = true
-            }
-        }
-    }
+//    val scrollListener = object : RecyclerView.OnScrollListener() {
+//        override fun onScrolled(recyclerView: RecyclerView, dx: Int, dy: Int) {
+//            super.onScrolled(recyclerView, dx, dy)
+//
+//            val layoutManager = recyclerView.layoutManager as LinearLayoutManager
+//            val firstVisibleItemPosition = layoutManager.findFirstVisibleItemPosition()
+//            val visibleItemCount = layoutManager.childCount
+//            val totalItemCount = layoutManager.itemCount
+//
+//            val isNotLoadingAndNotLastPage = !isLoading && !isLastPage
+//            val isAtLastItem = firstVisibleItemPosition + visibleItemCount >= totalItemCount
+//            val isNotAtBeginning = firstVisibleItemPosition >= 0
+//            val isTotalMoreThanVisible = totalItemCount >= QUERY_PAGE_SIZE
+//            val shouldPaginate = isNotLoadingAndNotLastPage && isAtLastItem && isNotAtBeginning &&
+//                    isTotalMoreThanVisible && isScrolling
+//            if (shouldPaginate) {
+//                viewModel.getLaunchesList()
+//                isScrolling = false
+//            } else {
+//                binding.rvArticles.setPadding(0, 0, 0, 0)
+//            }
+//        }
+//
+//        override fun onScrollStateChanged(recyclerView: RecyclerView, newState: Int) {
+//            super.onScrollStateChanged(recyclerView, newState)
+//            if (newState == AbsListView.OnScrollListener.SCROLL_STATE_TOUCH_SCROLL) {
+//                isScrolling = true
+//            }
+//        }
+//    }
 
     private fun setupRecyclerView() {
         launchesAdapter = LaunchesAdapter()
         binding.rvArticles.apply {
             adapter = launchesAdapter
             layoutManager = LinearLayoutManager(activity)
-            addOnScrollListener(this@LaunchesListFragment.scrollListener)
+            setHasFixedSize(true)
+            //addOnScrollListener(this@LaunchesListFragment.scrollListener)
         }
     }
 }
