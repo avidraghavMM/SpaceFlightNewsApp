@@ -14,8 +14,8 @@ interface SpaceFlightDao {
     suspend fun saveArticles(articles: List<ArticlesResponseItem>)
 
     @Query("SELECT * from articles ORDER by publishedAt DESC")
-    fun getArticles(): Flow<List<ArticlesResponseItem>>
+    fun getArticlesByPublishedData(): Flow<List<ArticlesResponseItem>>
 
     @Query("DELETE from articles")
-    suspend fun deleteArticles()
+    suspend fun deleteAllArticles()
 }

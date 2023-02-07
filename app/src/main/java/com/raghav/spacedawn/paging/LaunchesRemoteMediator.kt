@@ -59,6 +59,7 @@ class LaunchesRemoteMediator(
                 if (currentPage == 0) null else currentPage - Constants.LAUNCHES_INCREMENT
             val nextPage =
                 if (endOfPaginationReached) null else currentPage + Constants.LAUNCHES_INCREMENT
+
             database.withTransaction {
                 if (loadType == LoadType.REFRESH) {
                     database.getLaunchLibraryDao().deleteLaunches()
