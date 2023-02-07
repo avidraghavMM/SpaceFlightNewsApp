@@ -34,7 +34,7 @@ class AppRepository @Inject constructor(
         if (appContext.isConnectedToNetwork()) {
             database.getSpaceFlightDao().saveArticles(spaceFlightApi.getArticles(skipArticles))
         }
-        return database.getSpaceFlightDao().getArticles()
+        return database.getSpaceFlightDao().getArticlesByPublishedData()
     }
 
     suspend fun searchArticle(
@@ -48,18 +48,6 @@ class AppRepository @Inject constructor(
         }
         emit(result)
     }
-
-    /**
-     * Returns a list of launches from database after saving the api response
-     * in database if Internet connection available.
-     * In case there is no data in database an empty list is returned
-     * */
-//    suspend fun getLaunches(skipLaunches: Int): Flow<List<LaunchLibraryResponseItem>> {
-//        if (appContext.isConnectedToNetwork()) {
-//            launchLibraryDao.saveLaunches(launchLibraryApi.getLaunches(skipLaunches).results)
-//        }
-//        return launchLibraryDao.getLaunches()
-//    }
 
     @OptIn(ExperimentalPagingApi::class)
     fun getLaunches(): Flow<PagingData<LaunchLibraryResponseItem>> {

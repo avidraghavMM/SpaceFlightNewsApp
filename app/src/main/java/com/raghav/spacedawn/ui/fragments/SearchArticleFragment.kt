@@ -1,7 +1,6 @@
 package com.raghav.spacedawn.ui.fragments
 
 import android.os.Bundle
-import android.util.Log
 import android.view.View
 import android.widget.AbsListView
 import android.widget.Toast
@@ -31,7 +30,10 @@ class SearchArticleFragment : Fragment(R.layout.fragment_search_article) {
     private val viewModel by viewModels<SearchArticleFragmentVM>()
     private lateinit var articlesAdapter: ArticlesAdapter
     private lateinit var binding: FragmentSearchArticleBinding
-    private val TAG = "SearchArticleFragment"
+
+    companion object {
+        private const val TAG = "SearchArticleFragment"
+    }
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
@@ -55,7 +57,6 @@ class SearchArticleFragment : Fragment(R.layout.fragment_search_article) {
                 it.let {
                     if (it.toString().isNotEmpty()) {
                         viewModel.getSearchArticleList(it.toString())
-                        Log.d(TAG, "inside is Notempty")
                     }
                 }
             }
@@ -66,7 +67,6 @@ class SearchArticleFragment : Fragment(R.layout.fragment_search_article) {
                 when (it) {
                     is Resource.Error -> {
                         hideProgressBar()
-                        Log.d(TAG, "inside failure")
                         Toast.makeText(
                             requireContext(), "An error occurred: ${it.message}", Toast.LENGTH_LONG
                         ).show()
@@ -134,7 +134,6 @@ class SearchArticleFragment : Fragment(R.layout.fragment_search_article) {
             val isTotalMoreThanVisible = totalItemCount >= Constants.QUERY_PAGE_SIZE
             val shouldPaginate =
                 isNotLoadingAndNotLastPage && isAtLastItem && isNotAtBeginning && isTotalMoreThanVisible && isScrolling
-            Log.d(TAG, shouldPaginate.toString())
             if (shouldPaginate) {
                 viewModel.getSearchArticleList(binding.etSearch.text.toString())
                 isScrolling = false

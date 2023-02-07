@@ -1,7 +1,6 @@
 package com.raghav.spacedawn.ui.fragments
 
 import android.os.Bundle
-import android.util.Log
 import android.view.View
 import android.widget.AbsListView
 import android.widget.Toast
@@ -37,7 +36,6 @@ class ArticlesListFragment : Fragment(R.layout.fragment_articles_list) {
 
         viewLifecycleOwner.lifecycleScope.launchWhenStarted {
             viewModel.articlesFlow.collect {
-                Log.d(TAG, "ui-collector-triggered for $it")
                 when (it) {
                     is Resource.Error -> {
                         hideProgressBar()
@@ -47,7 +45,6 @@ class ArticlesListFragment : Fragment(R.layout.fragment_articles_list) {
                             Toast.LENGTH_LONG
                         ).show()
                         showErrorMessage(it.message.orEmpty())
-                        Log.d(TAG, "size-" + it.message.toString())
                     }
                     is Resource.Loading -> {
                         showProgressBar()
@@ -55,13 +52,8 @@ class ArticlesListFragment : Fragment(R.layout.fragment_articles_list) {
                     is Resource.Success -> {
                         hideProgressBar()
                         hideErrorMessage()
-
-                        Log.d(TAG, "size-" + it.data?.size.toString())
-                        it.data?.forEach { item ->
-                            Log.d(TAG, item.id.toString())
-                        }
                         if (it.data?.isEmpty() == true)
-                            showErrorMessage("Connect To Internet")
+                            showErrorMessage(getString(R.string.failed_to_connect))
                         else
                             articlesAdapter.differ.submitList(it.data)
                     }
