@@ -65,7 +65,7 @@ class AppRepository @Inject constructor(
     fun getLaunches(): Flow<PagingData<LaunchLibraryResponseItem>> {
         return Pager(
             config = PagingConfig(pageSize = 10, maxSize = 30),
-            remoteMediator = LaunchesRemoteMediator(launchLibrary, database),
+            remoteMediator = LaunchesRemoteMediator(launchLibrary, database, appContext),
             pagingSourceFactory = { database.getLaunchLibraryDao().getLaunches() }
         ).flow
     }
