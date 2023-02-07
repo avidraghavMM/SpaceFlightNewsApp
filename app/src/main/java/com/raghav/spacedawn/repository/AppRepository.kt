@@ -1,18 +1,17 @@
 package com.raghav.spacedawn.repository
 
 import android.content.Context
+import androidx.paging.ExperimentalPagingApi
 import androidx.paging.Pager
 import androidx.paging.PagingConfig
 import androidx.paging.PagingData
-import com.raghav.spacedawn.db.LaunchLibraryDao
-import com.raghav.spacedawn.db.ReminderDao
-import com.raghav.spacedawn.db.SpaceFlightDao
+import com.raghav.spacedawn.db.AppDatabase
 import com.raghav.spacedawn.models.launchlibrary.LaunchLibraryResponseItem
 import com.raghav.spacedawn.models.reminder.ReminderModelClass
 import com.raghav.spacedawn.models.spaceflightapi.ArticlesResponseItem
 import com.raghav.spacedawn.network.LaunchLibrary
 import com.raghav.spacedawn.network.SpaceFlightAPI
-import com.raghav.spacedawn.paging.LaunchesPagingSource
+import com.raghav.spacedawn.paging.LaunchesRemoteMediator
 import com.raghav.spacedawn.utils.Helpers.Companion.isConnectedToNetwork
 import dagger.hilt.android.qualifiers.ApplicationContext
 import kotlinx.coroutines.flow.Flow
@@ -21,11 +20,9 @@ import javax.inject.Inject
 
 class AppRepository @Inject constructor(
     @ApplicationContext private val appContext: Context,
-    private val reminderDao: ReminderDao,
-    private val spaceFlightDao: SpaceFlightDao,
     private val spaceFlightApi: SpaceFlightAPI,
     private val launchLibrary: LaunchLibrary,
-    private val launchLibraryDao: LaunchLibraryDao
+    private val database: AppDatabase
 ) {
 
     /**
@@ -35,9 +32,9 @@ class AppRepository @Inject constructor(
      * */
     suspend fun getArticles(skipArticles: Int): Flow<List<ArticlesResponseItem>> {
         if (appContext.isConnectedToNetwork()) {
-            spaceFlightDao.saveArticles(spaceFlightApi.getArticles(skipArticles))
+            database.getSpaceFlightDao().saveArticles(spaceFlightApi.getArticles(skipArticles))
         }
-        return spaceFlightDao.getArticles()
+        return database.getSpaceFlightDao().getArticles()
     }
 
     suspend fun searchArticle(
@@ -64,16 +61,20 @@ class AppRepository @Inject constructor(
 //        return launchLibraryDao.getLaunches()
 //    }
 
+    @OptIn(ExperimentalPagingApi::class)
     fun getLaunches(): Flow<PagingData<LaunchLibraryResponseItem>> {
         return Pager(
             config = PagingConfig(pageSize = 10, maxSize = 30),
-            pagingSourceFactory = { LaunchesPagingSource(launchLibrary) }
+            remoteMediator = LaunchesRemoteMediator(launchLibrary, database),
+            pagingSourceFactory = { database.getLaunchLibraryDao().getLaunches() }
         ).flow
     }
 
-    suspend fun insert(reminder: ReminderModelClass) = reminderDao.saveReminder(reminder)
+    suspend fun insert(reminder: ReminderModelClass) =
+        database.getRemindersDao().saveReminder(reminder)
 
-    fun getAllReminders() = reminderDao.getAllReminders()
-    fun getId(id: String) = reminderDao.exists(id)
-    suspend fun deleteReminder(reminder: ReminderModelClass) = reminderDao.deleteReminder(reminder)
+    fun getAllReminders() = database.getRemindersDao().getAllReminders()
+    fun getId(id: String) = database.getRemindersDao().exists(id)
+    suspend fun deleteReminder(reminder: ReminderModelClass) =
+        database.getRemindersDao().deleteReminder(reminder)
 }

@@ -5,7 +5,6 @@ import retrofit2.http.GET
 import retrofit2.http.Query
 
 interface LaunchLibrary {
-
     @GET("upcoming")
     suspend fun getLaunches(
         @Query("offset")

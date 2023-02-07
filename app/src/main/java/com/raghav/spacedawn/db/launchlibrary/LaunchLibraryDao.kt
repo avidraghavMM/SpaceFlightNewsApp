@@ -1,11 +1,11 @@
-package com.raghav.spacedawn.db
+package com.raghav.spacedawn.db.launchlibrary
 
+import androidx.paging.PagingSource
 import androidx.room.Dao
 import androidx.room.Insert
 import androidx.room.OnConflictStrategy
 import androidx.room.Query
 import com.raghav.spacedawn.models.launchlibrary.LaunchLibraryResponseItem
-import kotlinx.coroutines.flow.Flow
 
 @Dao
 interface LaunchLibraryDao {
@@ -14,5 +14,8 @@ interface LaunchLibraryDao {
     suspend fun saveLaunches(launches: List<LaunchLibraryResponseItem>)
 
     @Query("SELECT * from launches")
-    fun getLaunches(): Flow<List<LaunchLibraryResponseItem>>
+    fun getLaunches(): PagingSource<Int, LaunchLibraryResponseItem>
+
+    @Query("DELETE FROM launches")
+    suspend fun deleteLaunches()
 }
