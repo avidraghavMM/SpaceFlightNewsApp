@@ -115,21 +115,20 @@ class LaunchesListFragment : Fragment(R.layout.fragment_launches_list) {
         ).show()
     }
 
-    private fun hideProgressBar() {
-        binding.paginationProgressBar.visibility = View.INVISIBLE
+    private fun showProgressBar(visibility: Boolean) {
+        if (visibility)
+            binding.paginationProgressBar.visibility = View.VISIBLE
+        else
+            binding.paginationProgressBar.visibility = View.INVISIBLE
     }
 
-    private fun showProgressBar() {
-        binding.paginationProgressBar.visibility = View.VISIBLE
-    }
-
-    private fun hideErrorMessage() {
-        binding.itemErrorMessage.visibility = View.INVISIBLE
-    }
-
-    private fun showErrorMessage(message: String) {
-        binding.itemErrorMessage.visibility = View.VISIBLE
-        binding.tvErrorMessage.text = message
+    private fun showErrorMessage(visibility: Boolean, message: String = "") {
+        if (visibility) {
+            binding.itemErrorMessage.visibility = View.VISIBLE
+            binding.tvErrorMessage.text = message
+        } else {
+            binding.itemErrorMessage.visibility = View.INVISIBLE
+        }
     }
 
     private fun setupRecyclerView() {
@@ -137,19 +136,20 @@ class LaunchesListFragment : Fragment(R.layout.fragment_launches_list) {
         launchesAdapter.addLoadStateListener {
             when (it.refresh) {
                 LoadState.Loading -> {
-                    showProgressBar()
-                    hideErrorMessage()
+                    showProgressBar(true)
+                    showErrorMessage(false)
                 }
                 is LoadState.Error -> {
-                    hideProgressBar()
-                    showErrorMessage("Some Error Occurred")
+                    showProgressBar(false)
+                    showErrorMessage(true, getString(R.string.failed_to_connect))
                 }
                 else -> {
-                    hideProgressBar()
-                    hideErrorMessage()
+                    showProgressBar(false)
+                    showErrorMessage(false)
                 }
             }
         }
+
         binding.rvArticles.apply {
             adapter = launchesAdapter.withLoadStateHeaderAndFooter(
                 header = LoaderAdapter {
