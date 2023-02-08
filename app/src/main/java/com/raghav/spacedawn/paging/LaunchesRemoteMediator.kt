@@ -27,7 +27,8 @@ class LaunchesRemoteMediator(
 ) : RemoteMediator<Int, LaunchLibraryResponseItem>() {
 
     override suspend fun load(
-        loadType: LoadType, state: PagingState<Int, LaunchLibraryResponseItem>
+        loadType: LoadType,
+        state: PagingState<Int, LaunchLibraryResponseItem>
     ): MediatorResult {
         return try {
             if (!context.isConnectedToNetwork()) {
@@ -70,7 +71,6 @@ class LaunchesRemoteMediator(
                 if (endOfPaginationReached) null else currentPage + Constants.LAUNCHES_INCREMENT
 
             database.withTransaction {
-
                 // invalidate both keys and articles database during initial fetch
                 // or when some internal error occurs
                 if (loadType == LoadType.REFRESH) {
@@ -87,14 +87,15 @@ class LaunchesRemoteMediator(
 
                 val keys = response.results.map { launch ->
                     LaunchLibraryKeys(
-                        id = launch.id, prevPage = prevPage, nextPage = nextPage
+                        id = launch.id,
+                        prevPage = prevPage,
+                        nextPage = nextPage
                     )
                 }
                 database.getLaunchLibraryKeysDao().addAllKeys(keys)
             }
 
             MediatorResult.Success(endOfPaginationReached)
-
         } catch (e: Exception) {
             MediatorResult.Error(e)
         }

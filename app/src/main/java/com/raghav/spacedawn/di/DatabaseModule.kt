@@ -24,5 +24,4 @@ object DatabaseModule {
         AppDatabase::class.java,
         Constants.DATABASE_NAME
     ).build()
-
 }

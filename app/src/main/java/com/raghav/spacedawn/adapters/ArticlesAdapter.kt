@@ -25,9 +25,10 @@ class ArticlesAdapter : PagingDataAdapter<ArticlesResponseItem, ArticlesAdapter.
     }
 
     override fun onBindViewHolder(holder: ViewHolder, position: Int) {
-        val launch: ArticlesResponseItem? = getItem(position)
-        if (launch != null)
-            holder.bind(launch)
+        val article: ArticlesResponseItem? = getItem(position)
+        if (article != null) {
+            holder.bind(article)
+        }
     }
 
     class ViewHolder(private val binding: ItemArticlePreviewBinding) :

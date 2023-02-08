@@ -17,7 +17,7 @@ import com.raghav.spacedawn.utils.Helpers.Companion.isConnectedToNetwork
 /**
  * interacts with both api and database
  * @param api Api Service for fetching data from network
- * @param database
+ * @param database instance of app's database
  */
 @OptIn(ExperimentalPagingApi::class)
 class ArticlesRemoteMediator(
@@ -27,7 +27,8 @@ class ArticlesRemoteMediator(
 ) : RemoteMediator<Int, ArticlesResponseItem>() {
 
     override suspend fun load(
-        loadType: LoadType, state: PagingState<Int, ArticlesResponseItem>
+        loadType: LoadType,
+        state: PagingState<Int, ArticlesResponseItem>
     ): MediatorResult {
         return try {
             if (!context.isConnectedToNetwork()) {
@@ -88,7 +89,9 @@ class ArticlesRemoteMediator(
                 // across app sessions
                 val keys = response.map { article ->
                     ArticlesApiKeys(
-                        id = article.id, prevPage = prevPage, nextPage = nextPage
+                        id = article.id,
+                        prevPage = prevPage,
+                        nextPage = nextPage
                     )
                 }
                 database.getArticlesKeysDao().addAllKeys(keys)

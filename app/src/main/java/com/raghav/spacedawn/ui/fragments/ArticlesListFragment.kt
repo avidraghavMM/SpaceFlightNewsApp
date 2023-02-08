@@ -74,12 +74,12 @@ class ArticlesListFragment : Fragment(R.layout.fragment_articles_list) {
         }
     }
 
-    private fun showProgressBar(visibility: Boolean) {
-        binding.paginationProgressBar.visibility = if (visibility) View.VISIBLE else View.INVISIBLE
+    private fun showProgressBar(show: Boolean) {
+        binding.paginationProgressBar.visibility = if (show) View.VISIBLE else View.INVISIBLE
     }
 
-    private fun showErrorMessage(visibility: Boolean, message: String = "") {
-        if (visibility) {
+    private fun showErrorMessage(show: Boolean, message: String = "") {
+        if (show) {
             binding.itemErrorMessage.visibility = View.VISIBLE
             binding.tvErrorMessage.text = message
         } else {

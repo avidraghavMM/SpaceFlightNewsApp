@@ -52,21 +52,4 @@ object TypeConverter {
     fun fromStatus(value: Status?): String? {
         return gson.toJson(value)
     }
-
 }
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-

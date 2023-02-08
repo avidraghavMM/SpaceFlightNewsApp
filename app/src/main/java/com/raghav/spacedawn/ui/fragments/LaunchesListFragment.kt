@@ -47,7 +47,6 @@ class LaunchesListFragment : Fragment(R.layout.fragment_launches_list) {
         binding = FragmentLaunchesListBinding.bind(view)
         setupRecyclerView()
 
-
         viewLifecycleOwner.lifecycleScope.launchWhenStarted {
             viewModel.launchesList.collect {
                 launchesAdapter.submitData(viewLifecycleOwner.lifecycle, it)
