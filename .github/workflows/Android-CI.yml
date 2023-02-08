@@ -1,18 +1,14 @@
 name: Android-CI
 
-on:
-  push:
-    branches: [ master ]
-  pull_request:
-    branches: [ master ]
+on: pull_request
 
 jobs:
-  build-and-test:
-    name: Build, ktlint check and run unit tests
+
+  Ktlint:
     runs-on: macos-latest
     steps:
-      - name: Checkout current repository in macos' file system
-        uses: actions/checkout@v2
+      uses: actions/checkout@v2
+
       - name: Setup JDK 11
         uses: actions/setup-java@v2
         with:
@@ -23,30 +19,27 @@ jobs:
       - name: ktlint check
         run: ./gradlew ktlintCheck
 
-      - name: Unit tests
-        run: ./gradlew testDebugUnitTest --stacktrace
 
-  generate-apk:
-    name: Generate and upload debug apk
-    runs-on: ubuntu-latest
-    needs:
-      - build-and-test
+  unit_tests:
+    needs: [ Ktlint ]
+    runs-on: macos-latest
+    steps:
+      -uses: actions/checkout@v2
+
+        - name: Unit tests
+          run: ./gradlew test
+
+
+  build_and_assemble:
+    needs: [ unit_tests ]
+    runs-on: macos-latest
     steps:
       - uses: actions/checkout@v2
-      - name: Setup JDK 11
-        uses: actions/setup-java@v2
-        with:
-          java-version: '11'
-          distribution: 'temurin'
-          cache: gradle
 
-      - name: Generate debug apk
-        run: ./gradlew assembleDebug
+      - name: Build Project
+        run: ./gradlew build
 
-      - name: Upload apk
-        uses: actions/upload-artifact@v1
-        with:
-          name: build-output
-          path: app/build/outputs/apk/debug/app-debug.apk
+      - name: Assemble
+        run: ./gradlew assemble
 
 
