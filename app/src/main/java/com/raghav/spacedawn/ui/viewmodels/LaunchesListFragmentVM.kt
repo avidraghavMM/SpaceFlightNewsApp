@@ -1,5 +1,6 @@
 package com.raghav.spacedawn.ui.viewmodels
 
+import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import androidx.paging.PagingData
 import androidx.paging.cachedIn
@@ -15,7 +16,7 @@ import javax.inject.Inject
 @HiltViewModel
 class LaunchesListFragmentVM @Inject constructor(
     private val repository: AppRepository
-) : BaseViewModel() {
+) : ViewModel() {
 
     private var _launchesList: Flow<PagingData<LaunchLibraryResponseItem>> = emptyFlow()
     val launchesList: Flow<PagingData<LaunchLibraryResponseItem>> get() = _launchesList
