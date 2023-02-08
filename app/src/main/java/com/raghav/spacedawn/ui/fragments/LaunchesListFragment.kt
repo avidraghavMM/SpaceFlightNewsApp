@@ -116,10 +116,7 @@ class LaunchesListFragment : Fragment(R.layout.fragment_launches_list) {
     }
 
     private fun showProgressBar(visibility: Boolean) {
-        if (visibility)
-            binding.paginationProgressBar.visibility = View.VISIBLE
-        else
-            binding.paginationProgressBar.visibility = View.INVISIBLE
+        binding.paginationProgressBar.visibility = if (visibility) View.VISIBLE else View.INVISIBLE
     }
 
     private fun showErrorMessage(visibility: Boolean, message: String = "") {
@@ -134,20 +131,11 @@ class LaunchesListFragment : Fragment(R.layout.fragment_launches_list) {
     private fun setupRecyclerView() {
         launchesAdapter = LaunchesAdapter()
         launchesAdapter.addLoadStateListener {
-            when (it.refresh) {
-                LoadState.Loading -> {
-                    showProgressBar(true)
-                    showErrorMessage(false)
-                }
-                is LoadState.Error -> {
-                    showProgressBar(false)
-                    showErrorMessage(true, getString(R.string.failed_to_connect))
-                }
-                else -> {
-                    showProgressBar(false)
-                    showErrorMessage(false)
-                }
-            }
+            showProgressBar(it.refresh is LoadState.Loading)
+            showErrorMessage(
+                it.refresh is LoadState.Error,
+                getString(R.string.failed_to_connect)
+            )
         }
 
         binding.rvArticles.apply {

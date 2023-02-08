@@ -12,7 +12,7 @@ import androidx.navigation.fragment.findNavController
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.raghav.spacedawn.R
-import com.raghav.spacedawn.adapters.ArticlesAdapter
+import com.raghav.spacedawn.adapters.SearchArticlesAdapter
 import com.raghav.spacedawn.databinding.FragmentSearchArticleBinding
 import com.raghav.spacedawn.ui.viewmodels.SearchArticleFragmentVM
 import com.raghav.spacedawn.utils.Constants
@@ -28,7 +28,7 @@ import kotlinx.coroutines.launch
 class SearchArticleFragment : Fragment(R.layout.fragment_search_article) {
 
     private val viewModel by viewModels<SearchArticleFragmentVM>()
-    private lateinit var articlesAdapter: ArticlesAdapter
+    private lateinit var searchArticlesAdapter: SearchArticlesAdapter
     private lateinit var binding: FragmentSearchArticleBinding
 
     companion object {
@@ -40,7 +40,7 @@ class SearchArticleFragment : Fragment(R.layout.fragment_search_article) {
         binding = FragmentSearchArticleBinding.bind(view)
         setupRecyclerView()
 
-        articlesAdapter.setOnItemClickListener {
+        searchArticlesAdapter.setOnItemClickListener {
             val bundle = Bundle().apply {
                 putSerializable("article", it)
             }
@@ -79,7 +79,7 @@ class SearchArticleFragment : Fragment(R.layout.fragment_search_article) {
                     is Resource.Success -> {
                         hideProgressBar()
                         hideErrorMessage()
-                        articlesAdapter.differ.submitList(it.data)
+                        searchArticlesAdapter.differ.submitList(it.data)
                     }
                 }
             }
@@ -151,9 +151,9 @@ class SearchArticleFragment : Fragment(R.layout.fragment_search_article) {
     }
 
     private fun setupRecyclerView() {
-        articlesAdapter = ArticlesAdapter()
+        searchArticlesAdapter = SearchArticlesAdapter()
         binding.rvSearchArticles.apply {
-            adapter = articlesAdapter
+            adapter = searchArticlesAdapter
             layoutManager = LinearLayoutManager(activity)
             addOnScrollListener(this@SearchArticleFragment.scrollListener)
         }

@@ -11,6 +11,7 @@ import com.raghav.spacedawn.models.reminder.ReminderModelClass
 import com.raghav.spacedawn.models.spaceflightapi.ArticlesResponseItem
 import com.raghav.spacedawn.network.LaunchLibrary
 import com.raghav.spacedawn.network.SpaceFlightAPI
+import com.raghav.spacedawn.paging.ArticlesRemoteMediator
 import com.raghav.spacedawn.paging.LaunchesRemoteMediator
 import com.raghav.spacedawn.utils.Helpers.Companion.isConnectedToNetwork
 import dagger.hilt.android.qualifiers.ApplicationContext
@@ -24,17 +25,13 @@ class AppRepository @Inject constructor(
     private val launchLibrary: LaunchLibrary,
     private val database: AppDatabase
 ) {
-
-    /**
-     * Returns a list of articles from database after saving the api response
-     * in database if Internet connection available.
-     * In case there is no data in database an empty list is returned
-     * */
-    suspend fun getArticles(skipArticles: Int): Flow<List<ArticlesResponseItem>> {
-        if (appContext.isConnectedToNetwork()) {
-            database.getSpaceFlightDao().saveArticles(spaceFlightApi.getArticles(skipArticles))
-        }
-        return database.getSpaceFlightDao().getArticlesByPublishedData()
+    @OptIn(ExperimentalPagingApi::class)
+    fun getArticles(): Flow<PagingData<ArticlesResponseItem>> {
+        return Pager(
+            config = PagingConfig(pageSize = 10, maxSize = 30),
+            remoteMediator = ArticlesRemoteMediator(spaceFlightApi, database, appContext),
+            pagingSourceFactory = { database.getSpaceFlightDao().getArticlesByPublishedData() }
+        ).flow
     }
 
     suspend fun searchArticle(

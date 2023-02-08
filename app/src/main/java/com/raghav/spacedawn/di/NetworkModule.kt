@@ -1,8 +1,8 @@
 package com.raghav.spacedawn.di
 
+import BaseUrlProvider
 import com.raghav.spacedawn.network.LaunchLibrary
 import com.raghav.spacedawn.network.SpaceFlightAPI
-import com.raghav.spacedawn.utils.AppApplication
 import com.raghav.spacedawn.utils.Constants
 import dagger.Module
 import dagger.Provides
@@ -46,7 +46,7 @@ object NetworkModule {
     @Named(Constants.LAUNCH_LIBRARY_API)
     fun provideRetrofitForLaunchApi(client: OkHttpClient): Retrofit =
         Retrofit.Builder()
-            .baseUrl(AppApplication.INSTANCE.getLaunchLibraryBaseUrl())
+            .baseUrl(BaseUrlProvider.BASE_URL_LAUNCHLIBRARY)
             .addConverterFactory(
                 GsonConverterFactory
                     .create()

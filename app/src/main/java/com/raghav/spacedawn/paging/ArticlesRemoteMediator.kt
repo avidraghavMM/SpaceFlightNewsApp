@@ -8,9 +8,9 @@ import androidx.paging.PagingState
 import androidx.paging.RemoteMediator
 import androidx.room.withTransaction
 import com.raghav.spacedawn.db.AppDatabase
-import com.raghav.spacedawn.models.LaunchLibraryKeys
-import com.raghav.spacedawn.models.launchlibrary.LaunchLibraryResponseItem
-import com.raghav.spacedawn.network.LaunchLibrary
+import com.raghav.spacedawn.models.ArticlesApiKeys
+import com.raghav.spacedawn.models.spaceflightapi.ArticlesResponseItem
+import com.raghav.spacedawn.network.SpaceFlightAPI
 import com.raghav.spacedawn.utils.Constants
 import com.raghav.spacedawn.utils.Helpers.Companion.isConnectedToNetwork
 
@@ -20,14 +20,14 @@ import com.raghav.spacedawn.utils.Helpers.Companion.isConnectedToNetwork
  * @param database
  */
 @OptIn(ExperimentalPagingApi::class)
-class LaunchesRemoteMediator(
-    private val api: LaunchLibrary,
+class ArticlesRemoteMediator(
+    private val api: SpaceFlightAPI,
     private val database: AppDatabase,
     private val context: Context
-) : RemoteMediator<Int, LaunchLibraryResponseItem>() {
+) : RemoteMediator<Int, ArticlesResponseItem>() {
 
     override suspend fun load(
-        loadType: LoadType, state: PagingState<Int, LaunchLibraryResponseItem>
+        loadType: LoadType, state: PagingState<Int, ArticlesResponseItem>
     ): MediatorResult {
         return try {
             if (!context.isConnectedToNetwork()) {
@@ -37,7 +37,7 @@ class LaunchesRemoteMediator(
                 // initial display of data
                 LoadType.REFRESH -> {
                     val keys = getKeyClosestToCurrentPosition(state)
-                    keys?.nextPage?.minus(Constants.LAUNCHES_INCREMENT) ?: 0
+                    keys?.nextPage?.minus(Constants.ARTICLES_INCREMENT) ?: 0
                 }
                 // when RecyclerView is scrolled upwards
                 LoadType.PREPEND -> {
@@ -56,59 +56,58 @@ class LaunchesRemoteMediator(
                     nextPage
                 }
             }
-            val response = api.getLaunches(currentPage)
-            val endOfPaginationReached = response.next == "null"
-            Log.d("Test-launch", endOfPaginationReached.toString())
+            val response = api.getArticles(currentPage)
+            val endOfPaginationReached = api.getArticlesCount() == currentPage
+            Log.d("Test-articles", endOfPaginationReached.toString())
             val prevPage =
-                if (currentPage == 0) null else currentPage - Constants.LAUNCHES_INCREMENT
+                if (currentPage == 0) null else currentPage - Constants.ARTICLES_INCREMENT
             val nextPage =
-                if (endOfPaginationReached) null else currentPage + Constants.LAUNCHES_INCREMENT
+                if (endOfPaginationReached) null else currentPage + Constants.ARTICLES_INCREMENT
 
             database.withTransaction {
                 if (loadType == LoadType.REFRESH) {
-                    database.getLaunchLibraryDao().deleteLaunches()
-                    database.getLaunchLibraryKeysDao().deleteAllKeys()
+                    database.getSpaceFlightDao().deleteAllArticles()
+                    database.getArticlesKeysDao().deleteAllKeys()
                 }
-                database.getLaunchLibraryDao().saveLaunches(response.results)
-                val keys = response.results.map { launch ->
-                    LaunchLibraryKeys(
-                        id = launch.id, prevPage = prevPage, nextPage = nextPage
+                database.getSpaceFlightDao().saveArticles(response)
+                val keys = response.map { article ->
+                    ArticlesApiKeys(
+                        id = article.id, prevPage = prevPage, nextPage = nextPage
                     )
                 }
-                database.getLaunchLibraryKeysDao().addAllKeys(keys)
+                database.getArticlesKeysDao().addAllKeys(keys)
             }
-
             MediatorResult.Success(endOfPaginationReached)
-
         } catch (e: Exception) {
             MediatorResult.Error(e)
         }
     }
 
     private suspend fun getKeyClosestToCurrentPosition(
-        state: PagingState<Int, LaunchLibraryResponseItem>
-    ): LaunchLibraryKeys? {
+        state: PagingState<Int, ArticlesResponseItem>
+    ): ArticlesApiKeys? {
         return state.anchorPosition?.let { position ->
             state.closestItemToPosition(position)?.id?.let { id ->
-                database.getLaunchLibraryKeysDao().getKeys(id = id)
+                database.getArticlesKeysDao().getKeys(id = id)
             }
         }
     }
 
     private suspend fun getKeyForFirstItem(
-        state: PagingState<Int, LaunchLibraryResponseItem>
-    ): LaunchLibraryKeys? {
+        state: PagingState<Int, ArticlesResponseItem>
+    ): ArticlesApiKeys? {
         return state.pages.firstOrNull { it.data.isNotEmpty() }?.data?.firstOrNull()
-            ?.let { launch ->
-                database.getLaunchLibraryKeysDao().getKeys(id = launch.id)
+            ?.let { article ->
+                database.getArticlesKeysDao().getKeys(id = article.id)
             }
     }
 
     private suspend fun getKeyForLastItem(
-        state: PagingState<Int, LaunchLibraryResponseItem>
-    ): LaunchLibraryKeys? {
-        return state.pages.lastOrNull { it.data.isNotEmpty() }?.data?.lastOrNull()?.let { launch ->
-            database.getLaunchLibraryKeysDao().getKeys(id = launch.id)
-        }
+        state: PagingState<Int, ArticlesResponseItem>
+    ): ArticlesApiKeys? {
+        return state.pages.lastOrNull { it.data.isNotEmpty() }?.data?.lastOrNull()
+            ?.let { article ->
+                database.getArticlesKeysDao().getKeys(id = article.id)
+            }
     }
 }
