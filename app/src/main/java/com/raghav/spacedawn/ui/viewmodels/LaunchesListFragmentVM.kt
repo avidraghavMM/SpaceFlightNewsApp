@@ -8,6 +8,7 @@ import com.raghav.spacedawn.models.reminder.ReminderModelClass
 import com.raghav.spacedawn.repository.AppRepository
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.emptyFlow
 import kotlinx.coroutines.launch
 import javax.inject.Inject
 
@@ -16,7 +17,7 @@ class LaunchesListFragmentVM @Inject constructor(
     private val repository: AppRepository
 ) : ViewModel() {
 
-    private lateinit var _launchesList: Flow<PagingData<LaunchLibraryResponseItem>>
+    private var _launchesList: Flow<PagingData<LaunchLibraryResponseItem>> = emptyFlow()
     val launchesList: Flow<PagingData<LaunchLibraryResponseItem>> get() = _launchesList
 
     init {

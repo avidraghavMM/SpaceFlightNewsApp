@@ -45,7 +45,8 @@ class SearchArticleFragment : Fragment(R.layout.fragment_search_article) {
                 putSerializable("article", it)
             }
             findNavController().navigate(
-                R.id.action_searchArticleFragment_to_articleDisplayFragment, bundle
+                R.id.action_searchArticleFragment_to_articleDisplayFragment,
+                bundle
             )
         }
         // Search Articles functionality implementation
@@ -68,13 +69,16 @@ class SearchArticleFragment : Fragment(R.layout.fragment_search_article) {
                     is Resource.Error -> {
                         hideProgressBar()
                         Toast.makeText(
-                            requireContext(), "An error occurred: ${it.message}", Toast.LENGTH_LONG
+                            requireContext(),
+                            "An error occurred: ${it.message}",
+                            Toast.LENGTH_LONG
                         ).show()
                         showErrorMessage(it.message.orEmpty())
                     }
                     is Resource.Loading -> {
-                        if (binding.etSearch.text.isEmpty())
+                        if (binding.etSearch.text.isEmpty()) {
                             showProgressBar()
+                        }
                     }
                     is Resource.Success -> {
                         hideProgressBar()
@@ -154,7 +158,6 @@ class SearchArticleFragment : Fragment(R.layout.fragment_search_article) {
         searchArticlesAdapter = SearchArticlesAdapter()
         binding.rvSearchArticles.apply {
             adapter = searchArticlesAdapter
-            layoutManager = LinearLayoutManager(activity)
             addOnScrollListener(this@SearchArticleFragment.scrollListener)
         }
     }
