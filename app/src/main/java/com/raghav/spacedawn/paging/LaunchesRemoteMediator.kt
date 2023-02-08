@@ -17,7 +17,7 @@ import com.raghav.spacedawn.utils.Helpers.Companion.isConnectedToNetwork
 /**
  * interacts with both api and database
  * @param api Api Service for fetching data from network
- * @param database
+ * @param database instance of app's database
  */
 @OptIn(ExperimentalPagingApi::class)
 class LaunchesRemoteMediator(
