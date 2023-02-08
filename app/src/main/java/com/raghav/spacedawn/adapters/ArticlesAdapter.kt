@@ -70,5 +70,4 @@ class ArticlesAdapter : RecyclerView.Adapter<ArticlesAdapter.ViewHolder>() {
         }
     }
     val differ = AsyncListDiffer(this, differCallBack)
-
 }
