@@ -1,12 +1,12 @@
 package com.raghav.spacedawn.paging
 
 import android.content.Context
-import android.util.Log
 import androidx.paging.ExperimentalPagingApi
 import androidx.paging.LoadType
 import androidx.paging.PagingState
 import androidx.paging.RemoteMediator
 import androidx.room.withTransaction
+import com.raghav.spacedawn.R
 import com.raghav.spacedawn.db.AppDatabase
 import com.raghav.spacedawn.models.LaunchLibraryKeys
 import com.raghav.spacedawn.models.launchlibrary.LaunchLibraryResponseItem
@@ -31,7 +31,7 @@ class LaunchesRemoteMediator(
     ): MediatorResult {
         return try {
             if (!context.isConnectedToNetwork()) {
-                return MediatorResult.Success(true)
+                return MediatorResult.Error(Throwable(message = context.getString(R.string.failed_to_connect)))
             }
             val currentPage = when (loadType) {
                 // initial display of data
@@ -58,18 +58,33 @@ class LaunchesRemoteMediator(
             }
             val response = api.getLaunches(currentPage)
             val endOfPaginationReached = response.next == "null"
-            Log.d("Test-launch", endOfPaginationReached.toString())
+
+            // query param to fetch the preceding page is required when
+            // RecyclerView is scrolled upwards
             val prevPage =
                 if (currentPage == 0) null else currentPage - Constants.LAUNCHES_INCREMENT
+
+            // query param to fetch the succeeding page is required when
+            // RecyclerView is scrolled downwards
             val nextPage =
                 if (endOfPaginationReached) null else currentPage + Constants.LAUNCHES_INCREMENT
 
             database.withTransaction {
+
+                // invalidate both keys and articles database during initial fetch
+                // or when some internal error occurs
                 if (loadType == LoadType.REFRESH) {
                     database.getLaunchLibraryDao().deleteLaunches()
                     database.getLaunchLibraryKeysDao().deleteAllKeys()
                 }
+
+                // save launches in database
                 database.getLaunchLibraryDao().saveLaunches(response.results)
+
+                // a separate table corresponding to query params need
+                // to be kept so that the state of pagination can be persisted
+                // across app sessions
+
                 val keys = response.results.map { launch ->
                     LaunchLibraryKeys(
                         id = launch.id, prevPage = prevPage, nextPage = nextPage
@@ -85,6 +100,11 @@ class LaunchesRemoteMediator(
         }
     }
 
+    /**
+     * this method will only be called during initial fetch
+     * anchorPosition is maintained by Paging Library to figure out
+     * which page to load next.
+     */
     private suspend fun getKeyClosestToCurrentPosition(
         state: PagingState<Int, LaunchLibraryResponseItem>
     ): LaunchLibraryKeys? {
@@ -95,6 +115,10 @@ class LaunchesRemoteMediator(
         }
     }
 
+    /**
+     * this method fetches the query_param/key from keys table
+     * to fetch a page preceding the current page
+     */
     private suspend fun getKeyForFirstItem(
         state: PagingState<Int, LaunchLibraryResponseItem>
     ): LaunchLibraryKeys? {
@@ -104,6 +128,10 @@ class LaunchesRemoteMediator(
             }
     }
 
+    /**
+     * this method fetches the query_param/key from keys table
+     * to fetch a page succeeding the current page
+     */
     private suspend fun getKeyForLastItem(
         state: PagingState<Int, LaunchLibraryResponseItem>
     ): LaunchLibraryKeys? {
