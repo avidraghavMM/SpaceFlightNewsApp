@@ -1,12 +1,12 @@
 package com.raghav.spacedawn.paging
 
 import android.content.Context
-import android.util.Log
 import androidx.paging.ExperimentalPagingApi
 import androidx.paging.LoadType
 import androidx.paging.PagingState
 import androidx.paging.RemoteMediator
 import androidx.room.withTransaction
+import com.raghav.spacedawn.R
 import com.raghav.spacedawn.db.AppDatabase
 import com.raghav.spacedawn.models.ArticlesApiKeys
 import com.raghav.spacedawn.models.spaceflightapi.ArticlesResponseItem
@@ -31,7 +31,7 @@ class ArticlesRemoteMediator(
     ): MediatorResult {
         return try {
             if (!context.isConnectedToNetwork()) {
-                return MediatorResult.Success(true)
+                return MediatorResult.Error(Throwable(message = context.getString(R.string.failed_to_connect)))
             }
             val currentPage = when (loadType) {
                 // initial display of data
@@ -57,19 +57,35 @@ class ArticlesRemoteMediator(
                 }
             }
             val response = api.getArticles(currentPage)
+
+            // api call to get the articles available at the backend and hence calculate
+            // whether further pagination can be done
             val endOfPaginationReached = api.getArticlesCount() == currentPage
-            Log.d("Test-articles", endOfPaginationReached.toString())
+
+            // query param to fetch the preceding page is required when
+            // RecyclerView is scrolled upwards
             val prevPage =
                 if (currentPage == 0) null else currentPage - Constants.ARTICLES_INCREMENT
+
+            // query param to fetch the succeeding page is required when
+            // RecyclerView is scrolled downwards
             val nextPage =
                 if (endOfPaginationReached) null else currentPage + Constants.ARTICLES_INCREMENT
 
             database.withTransaction {
+                // invalidate both keys and articles database during initial fetch
+                // or when some internal error occurs
                 if (loadType == LoadType.REFRESH) {
                     database.getSpaceFlightDao().deleteAllArticles()
                     database.getArticlesKeysDao().deleteAllKeys()
                 }
+
+                // save articles in database
                 database.getSpaceFlightDao().saveArticles(response)
+
+                // a separate table corresponding to query params need
+                // to be kept so that the state of pagination can be persisted
+                // across app sessions
                 val keys = response.map { article ->
                     ArticlesApiKeys(
                         id = article.id, prevPage = prevPage, nextPage = nextPage
@@ -83,6 +99,11 @@ class ArticlesRemoteMediator(
         }
     }
 
+    /**
+     *  this method will only be called during initial fetch.
+     * anchorPosition is maintained by Paging Library to figure out
+     * which page to load next.
+     */
     private suspend fun getKeyClosestToCurrentPosition(
         state: PagingState<Int, ArticlesResponseItem>
     ): ArticlesApiKeys? {
@@ -93,6 +114,10 @@ class ArticlesRemoteMediator(
         }
     }
 
+    /**
+     * this method fetches the query_param/key from keys table
+     * to fetch a page preceding the current page
+     */
     private suspend fun getKeyForFirstItem(
         state: PagingState<Int, ArticlesResponseItem>
     ): ArticlesApiKeys? {
@@ -102,6 +127,10 @@ class ArticlesRemoteMediator(
             }
     }
 
+    /**
+     * this method fetches the query_param/key from keys table
+     * to fetch a page succeeding the current page
+     */
     private suspend fun getKeyForLastItem(
         state: PagingState<Int, ArticlesResponseItem>
     ): ArticlesApiKeys? {
