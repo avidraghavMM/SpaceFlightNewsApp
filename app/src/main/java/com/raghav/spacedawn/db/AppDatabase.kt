@@ -14,8 +14,10 @@ import com.raghav.spacedawn.models.reminder.ReminderModelClass
 import com.raghav.spacedawn.models.spaceflightapi.ArticlesResponseItem
 
 @Database(
-    entities = [ReminderModelClass::class, ArticlesResponseItem::class, LaunchLibraryResponseItem::class,
-        LaunchLibraryKeys::class, ArticlesApiKeys::class],
+    entities = [
+        ReminderModelClass::class, ArticlesResponseItem::class, LaunchLibraryResponseItem::class,
+        LaunchLibraryKeys::class, ArticlesApiKeys::class
+    ],
     version = 1,
     exportSchema = false
 )
@@ -27,5 +29,4 @@ abstract class AppDatabase : RoomDatabase() {
     abstract fun getLaunchLibraryDao(): LaunchLibraryDao
     abstract fun getLaunchLibraryKeysDao(): LaunchLibraryKeysDao
     abstract fun getArticlesKeysDao(): ArticlesApiKeysDao
-
 }

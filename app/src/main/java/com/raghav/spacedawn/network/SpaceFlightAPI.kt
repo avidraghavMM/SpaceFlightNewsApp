@@ -14,8 +14,7 @@ interface SpaceFlightAPI {
     ): ArticlesResponse
 
     @GET("articles/count")
-    suspend fun getArticlesCount(
-    ): Int
+    suspend fun getArticlesCount(): Int
 
     @GET("articles")
     suspend fun searchArticles(
