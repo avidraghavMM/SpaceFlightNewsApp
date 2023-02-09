@@ -1,21 +1,22 @@
 package com.raghav.spacedawn.models.launchlibrary
 
-import androidx.room.Entity
-import androidx.room.PrimaryKey
 import java.io.Serializable
 
-@Entity(tableName = "launches")
 data class LaunchLibraryResponseItem(
-    @PrimaryKey
-    val id: String,
     val failreason: String,
+    val hashtag: Any,
     val holdreason: String,
-    val image: String?,
+    val id: String,
+    val image: String,
+    val infographic: Any,
     val last_updated: String,
     val launch_service_provider: LaunchServiceProvider,
+    val mission: Mission,
     val name: String,
     val net: String,
+    val pad: Pad,
     val probability: Int,
+    val program: List<Program>,
     val rocket: Rocket,
     val slug: String,
     val status: Status,
