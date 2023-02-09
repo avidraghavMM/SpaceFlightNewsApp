@@ -1,7 +1,6 @@
 package com.raghav.spacedawn.ui.fragments
 
 import android.os.Bundle
-import android.util.Log
 import android.view.View
 import android.widget.AbsListView
 import android.widget.Toast
@@ -13,7 +12,7 @@ import androidx.navigation.fragment.findNavController
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.raghav.spacedawn.R
-import com.raghav.spacedawn.adapters.ArticlesAdapter
+import com.raghav.spacedawn.adapters.SearchArticlesAdapter
 import com.raghav.spacedawn.databinding.FragmentSearchArticleBinding
 import com.raghav.spacedawn.ui.viewmodels.SearchArticleFragmentVM
 import com.raghav.spacedawn.utils.Constants
@@ -29,21 +28,25 @@ import kotlinx.coroutines.launch
 class SearchArticleFragment : Fragment(R.layout.fragment_search_article) {
 
     private val viewModel by viewModels<SearchArticleFragmentVM>()
-    private lateinit var articlesAdapter: ArticlesAdapter
+    private lateinit var searchArticlesAdapter: SearchArticlesAdapter
     private lateinit var binding: FragmentSearchArticleBinding
-    private val TAG = "SearchArticleFragment"
+
+    companion object {
+        private const val TAG = "SearchArticleFragment"
+    }
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
         binding = FragmentSearchArticleBinding.bind(view)
         setupRecyclerView()
 
-        articlesAdapter.setOnItemClickListener {
+        searchArticlesAdapter.setOnItemClickListener {
             val bundle = Bundle().apply {
                 putSerializable("article", it)
             }
             findNavController().navigate(
-                R.id.action_searchArticleFragment_to_articleDisplayFragment, bundle
+                R.id.action_searchArticleFragment_to_articleDisplayFragment,
+                bundle
             )
         }
         // Search Articles functionality implementation
@@ -55,7 +58,6 @@ class SearchArticleFragment : Fragment(R.layout.fragment_search_article) {
                 it.let {
                     if (it.toString().isNotEmpty()) {
                         viewModel.getSearchArticleList(it.toString())
-                        Log.d(TAG, "inside is Notempty")
                     }
                 }
             }
@@ -66,20 +68,22 @@ class SearchArticleFragment : Fragment(R.layout.fragment_search_article) {
                 when (it) {
                     is Resource.Error -> {
                         hideProgressBar()
-                        Log.d(TAG, "inside failure")
                         Toast.makeText(
-                            requireContext(), "An error occurred: ${it.message}", Toast.LENGTH_LONG
+                            requireContext(),
+                            "An error occurred: ${it.message}",
+                            Toast.LENGTH_LONG
                         ).show()
                         showErrorMessage(it.message.orEmpty())
                     }
                     is Resource.Loading -> {
-                        if (binding.etSearch.text.isEmpty())
+                        if (binding.etSearch.text.isEmpty()) {
                             showProgressBar()
+                        }
                     }
                     is Resource.Success -> {
                         hideProgressBar()
                         hideErrorMessage()
-                        articlesAdapter.differ.submitList(it.data)
+                        searchArticlesAdapter.differ.submitList(it.data)
                     }
                 }
             }
@@ -134,7 +138,6 @@ class SearchArticleFragment : Fragment(R.layout.fragment_search_article) {
             val isTotalMoreThanVisible = totalItemCount >= Constants.QUERY_PAGE_SIZE
             val shouldPaginate =
                 isNotLoadingAndNotLastPage && isAtLastItem && isNotAtBeginning && isTotalMoreThanVisible && isScrolling
-            Log.d(TAG, shouldPaginate.toString())
             if (shouldPaginate) {
                 viewModel.getSearchArticleList(binding.etSearch.text.toString())
                 isScrolling = false
@@ -152,10 +155,9 @@ class SearchArticleFragment : Fragment(R.layout.fragment_search_article) {
     }
 
     private fun setupRecyclerView() {
-        articlesAdapter = ArticlesAdapter()
+        searchArticlesAdapter = SearchArticlesAdapter()
         binding.rvSearchArticles.apply {
-            adapter = articlesAdapter
-            layoutManager = LinearLayoutManager(activity)
+            adapter = searchArticlesAdapter
             addOnScrollListener(this@SearchArticleFragment.scrollListener)
         }
     }
