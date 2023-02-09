@@ -10,6 +10,7 @@ import android.content.Intent
 import android.media.MediaPlayer
 import android.os.Build
 import android.provider.Settings
+import android.util.Log
 import androidx.core.app.NotificationCompat
 import androidx.core.app.NotificationManagerCompat
 import androidx.core.app.TaskStackBuilder
@@ -23,6 +24,8 @@ class AlarmBroadCastReciever : BroadcastReceiver() {
     override fun onReceive(p0: Context?, p1: Intent?) {
         mediaPlayer = MediaPlayer.create(p0, Settings.System.DEFAULT_ALARM_ALERT_URI)
         mediaPlayer.start()
+
+        Log.e("App Alarm", "Alarm just fired")
 
         createNotificationChannel(p0)
         val intent = Intent(p0, MainActivity::class.java)

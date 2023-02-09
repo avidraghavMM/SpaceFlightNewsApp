@@ -8,7 +8,7 @@ import androidx.recyclerview.widget.RecyclerView
 import com.bumptech.glide.Glide
 import com.raghav.spacedawn.R
 import com.raghav.spacedawn.databinding.ItemReminderPreviewBinding
-import com.raghav.spacedawn.models.reminder.ReminderModelClass
+import com.raghav.spacedawn.db.ReminderModelClass
 
 class RemindersListAdapter() : RecyclerView.Adapter<RemindersListAdapter.ViewHolder>() {
 

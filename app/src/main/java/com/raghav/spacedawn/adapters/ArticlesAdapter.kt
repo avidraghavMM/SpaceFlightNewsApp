@@ -59,7 +59,7 @@ class ArticlesAdapter : RecyclerView.Adapter<ArticlesAdapter.ViewHolder>() {
             oldItem: ArticlesResponseItem,
             newItem: ArticlesResponseItem
         ): Boolean {
-            return oldItem.id == newItem.id
+            return oldItem.url == newItem.url
         }
 
         override fun areContentsTheSame(
