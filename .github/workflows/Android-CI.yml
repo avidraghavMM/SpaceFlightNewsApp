@@ -27,7 +27,7 @@ jobs:
       - uses: actions/checkout@v1
 
       - name: Unit tests
-        run: ./gradlew testDebugUnitTest --stacktrace
+        run: ./gradlew test --stacktrace
 
 
   build_and_assemble:
@@ -36,10 +36,7 @@ jobs:
     steps:
       - uses: actions/checkout@v1
 
-      - name: Build Project
-        run: ./gradlew build
-
       - name: Assemble
-        run: ./gradlew assemble
+        run: ./gradlew assembleDebug
 
 
