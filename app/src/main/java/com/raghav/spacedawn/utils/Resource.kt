@@ -1,5 +1,8 @@
 package com.raghav.spacedawn.utils
 
+/**
+ * A generic class that contains the data and status about loading this data
+ * */
 sealed class Resource<T>(
     val data: T? = null,
     val message: String? = null

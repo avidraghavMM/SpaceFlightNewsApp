@@ -8,14 +8,14 @@ import android.widget.Toast
 import androidx.core.widget.addTextChangedListener
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.viewModels
-import androidx.lifecycle.Observer
+import androidx.lifecycle.lifecycleScope
 import androidx.navigation.fragment.findNavController
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.raghav.spacedawn.R
 import com.raghav.spacedawn.adapters.ArticlesAdapter
 import com.raghav.spacedawn.databinding.FragmentSearchArticleBinding
-import com.raghav.spacedawn.ui.AppViewModel
+import com.raghav.spacedawn.ui.viewmodels.SearchArticleFragmentVM
 import com.raghav.spacedawn.utils.Constants
 import com.raghav.spacedawn.utils.Constants.Companion.DELAY_TIME
 import com.raghav.spacedawn.utils.Resource
@@ -28,8 +28,8 @@ import kotlinx.coroutines.launch
 @AndroidEntryPoint
 class SearchArticleFragment : Fragment(R.layout.fragment_search_article) {
 
-    private val viewModel by viewModels<AppViewModel>()
-    lateinit var articlesAdapter: ArticlesAdapter
+    private val viewModel by viewModels<SearchArticleFragmentVM>()
+    private lateinit var articlesAdapter: ArticlesAdapter
     private lateinit var binding: FragmentSearchArticleBinding
     private val TAG = "SearchArticleFragment"
 
@@ -43,8 +43,7 @@ class SearchArticleFragment : Fragment(R.layout.fragment_search_article) {
                 putSerializable("article", it)
             }
             findNavController().navigate(
-                R.id.action_searchArticleFragment_to_articleDisplayFragment,
-                bundle
+                R.id.action_searchArticleFragment_to_articleDisplayFragment, bundle
             )
         }
         // Search Articles functionality implementation
@@ -61,38 +60,30 @@ class SearchArticleFragment : Fragment(R.layout.fragment_search_article) {
                 }
             }
         }
-        viewModel.searchArticleList.observe(
-            viewLifecycleOwner,
-            Observer { response ->
-                when (response) {
-                    is Resource.Success -> {
-                        Log.d(TAG, "inside success")
-                        hideProgressBar()
-                        hideErrorMessage()
-                        response.data?.let {
-                            articlesAdapter.differ.submitList(it)
-                        }
-                    }
+
+        viewLifecycleOwner.lifecycleScope.launchWhenStarted {
+            viewModel.searchArticlesFlow.collect {
+                when (it) {
                     is Resource.Error -> {
                         hideProgressBar()
                         Log.d(TAG, "inside failure")
-                        response.message?.let { message ->
-                            Toast.makeText(
-                                activity,
-                                "An error occured: $message",
-                                Toast.LENGTH_LONG
-                            )
-                                .show()
-                            showErrorMessage(message)
-                        }
+                        Toast.makeText(
+                            requireContext(), "An error occurred: ${it.message}", Toast.LENGTH_LONG
+                        ).show()
+                        showErrorMessage(it.message.orEmpty())
                     }
                     is Resource.Loading -> {
-                        Log.d(TAG, "inside loading")
-                        showProgressBar()
+                        if (binding.etSearch.text.isEmpty())
+                            showProgressBar()
+                    }
+                    is Resource.Success -> {
+                        hideProgressBar()
+                        hideErrorMessage()
+                        articlesAdapter.differ.submitList(it.data)
                     }
                 }
             }
-        )
+        }
         binding.btnRetry.setOnClickListener {
             if (binding.etSearch.text.toString().isNotEmpty()) {
                 viewModel.getSearchArticleList(binding.etSearch.text.toString())
@@ -141,8 +132,8 @@ class SearchArticleFragment : Fragment(R.layout.fragment_search_article) {
             val isAtLastItem = firstVisibleItemPosition + visibleItemCount >= totalItemCount
             val isNotAtBeginning = firstVisibleItemPosition >= 0
             val isTotalMoreThanVisible = totalItemCount >= Constants.QUERY_PAGE_SIZE
-            val shouldPaginate = isNotLoadingAndNotLastPage && isAtLastItem && isNotAtBeginning &&
-                isTotalMoreThanVisible && isScrolling
+            val shouldPaginate =
+                isNotLoadingAndNotLastPage && isAtLastItem && isNotAtBeginning && isTotalMoreThanVisible && isScrolling
             Log.d(TAG, shouldPaginate.toString())
             if (shouldPaginate) {
                 viewModel.getSearchArticleList(binding.etSearch.text.toString())

@@ -1,4 +1,4 @@
-package com.raghav.spacedawn.db
+package com.raghav.spacedawn.models.reminder
 
 import androidx.room.Entity
 import androidx.room.PrimaryKey
@@ -12,5 +12,5 @@ data class ReminderModelClass(
     val dateTime: String,
     val pendingIntentId: Int,
     val status: String,
-    val image: String
+    val image: String?
 ) : Serializable

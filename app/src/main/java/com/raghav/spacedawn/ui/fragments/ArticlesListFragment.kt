@@ -7,14 +7,14 @@ import android.widget.AbsListView
 import android.widget.Toast
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.viewModels
-import androidx.lifecycle.Observer
+import androidx.lifecycle.lifecycleScope
 import androidx.navigation.fragment.findNavController
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.raghav.spacedawn.R
 import com.raghav.spacedawn.adapters.ArticlesAdapter
 import com.raghav.spacedawn.databinding.FragmentArticlesListBinding
-import com.raghav.spacedawn.ui.AppViewModel
+import com.raghav.spacedawn.ui.viewmodels.ArticlesListFragmentVM
 import com.raghav.spacedawn.utils.Constants.Companion.QUERY_PAGE_SIZE
 import com.raghav.spacedawn.utils.Resource
 import dagger.hilt.android.AndroidEntryPoint
@@ -22,15 +22,52 @@ import dagger.hilt.android.AndroidEntryPoint
 @AndroidEntryPoint
 class ArticlesListFragment : Fragment(R.layout.fragment_articles_list) {
 
-    private val viewModel by viewModels<AppViewModel>()
-    lateinit var articlesAdapter: ArticlesAdapter
+    private val viewModel by viewModels<ArticlesListFragmentVM>()
+    private lateinit var articlesAdapter: ArticlesAdapter
     private lateinit var binding: FragmentArticlesListBinding
-    private val TAG = "ArticlesListFragment"
+
+    companion object {
+        const val TAG = "ArticlesListFragment"
+    }
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
         binding = FragmentArticlesListBinding.bind(view)
         setupRecyclerView()
+
+        viewLifecycleOwner.lifecycleScope.launchWhenStarted {
+            viewModel.articlesFlow.collect {
+                Log.d(TAG, "ui-collector-triggered for $it")
+                when (it) {
+                    is Resource.Error -> {
+                        hideProgressBar()
+                        Toast.makeText(
+                            requireContext(),
+                            "An error occurred: ${it.message}",
+                            Toast.LENGTH_LONG
+                        ).show()
+                        showErrorMessage(it.message.orEmpty())
+                        Log.d(TAG, "size-" + it.message.toString())
+                    }
+                    is Resource.Loading -> {
+                        showProgressBar()
+                    }
+                    is Resource.Success -> {
+                        hideProgressBar()
+                        hideErrorMessage()
+
+                        Log.d(TAG, "size-" + it.data?.size.toString())
+                        it.data?.forEach { item ->
+                            Log.d(TAG, item.id.toString())
+                        }
+                        if (it.data?.isEmpty() == true)
+                            showErrorMessage("Connect To Internet")
+                        else
+                            articlesAdapter.differ.submitList(it.data)
+                    }
+                }
+            }
+        }
 
         articlesAdapter.setOnItemClickListener {
             val bundle = Bundle().apply {
@@ -41,36 +78,6 @@ class ArticlesListFragment : Fragment(R.layout.fragment_articles_list) {
                 bundle
             )
         }
-
-        viewModel.articlesList.observe(
-            viewLifecycleOwner,
-            Observer { response ->
-                when (response) {
-                    is Resource.Success -> {
-                        hideProgressBar()
-                        hideErrorMessage()
-                        response.data?.let {
-                            articlesAdapter.differ.submitList(it.toList())
-                        }
-                    }
-                    is Resource.Error -> {
-                        hideProgressBar()
-                        Log.d(TAG, "inside failure")
-                        response.message?.let { message ->
-                            Toast.makeText(
-                                activity,
-                                "An error occured: $message",
-                                Toast.LENGTH_LONG
-                            ).show()
-                            showErrorMessage(message)
-                        }
-                    }
-                    is Resource.Loading -> {
-                        showProgressBar()
-                    }
-                }
-            }
-        )
         binding.btnRetry.setOnClickListener {
             viewModel.getArticlesList()
         }
@@ -116,7 +123,7 @@ class ArticlesListFragment : Fragment(R.layout.fragment_articles_list) {
             val isNotAtBeginning = firstVisibleItemPosition >= 0
             val isTotalMoreThanVisible = totalItemCount >= QUERY_PAGE_SIZE
             val shouldPaginate = isNotLoadingAndNotLastPage && isAtLastItem && isNotAtBeginning &&
-                isTotalMoreThanVisible && isScrolling
+                    isTotalMoreThanVisible && isScrolling
             if (shouldPaginate) {
                 viewModel.getArticlesList()
                 isScrolling = false
