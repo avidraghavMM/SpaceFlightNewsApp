@@ -6,25 +6,27 @@ import android.content.Context
 import android.content.Intent
 import android.os.Bundle
 import android.view.View
+import android.widget.AbsListView
 import android.widget.Toast
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.viewModels
 import androidx.lifecycle.lifecycleScope
-import androidx.paging.LoadState
 import androidx.recyclerview.widget.LinearLayoutManager
+import androidx.recyclerview.widget.RecyclerView
 import com.raghav.spacedawn.R
 import com.raghav.spacedawn.adapters.LaunchesAdapter
 import com.raghav.spacedawn.databinding.FragmentLaunchesListBinding
 import com.raghav.spacedawn.models.launchlibrary.LaunchLibraryResponseItem
 import com.raghav.spacedawn.models.reminder.ReminderModelClass
-import com.raghav.spacedawn.paging.LoaderAdapter
 import com.raghav.spacedawn.ui.viewmodels.LaunchesListFragmentVM
 import com.raghav.spacedawn.utils.AlarmBroadCastReciever
 import com.raghav.spacedawn.utils.Constants
 import com.raghav.spacedawn.utils.Constants.Companion.MinutestoMiliseconds
+import com.raghav.spacedawn.utils.Constants.Companion.QUERY_PAGE_SIZE
 import com.raghav.spacedawn.utils.Constants.Companion.STATUS_SET
 import com.raghav.spacedawn.utils.Helpers.Companion.formatTo
 import com.raghav.spacedawn.utils.Helpers.Companion.toDate
+import com.raghav.spacedawn.utils.Resource
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
@@ -37,19 +39,38 @@ class LaunchesListFragment : Fragment(R.layout.fragment_launches_list) {
     private val viewModel by viewModels<LaunchesListFragmentVM>()
     private lateinit var launchesAdapter: LaunchesAdapter
     private lateinit var binding: FragmentLaunchesListBinding
-
-    companion object {
-        private const val TAG = "LaunchesListFragment"
-    }
+    private val TAG = "LaunchesListFragment"
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
         binding = FragmentLaunchesListBinding.bind(view)
         setupRecyclerView()
 
+
         viewLifecycleOwner.lifecycleScope.launchWhenStarted {
-            viewModel.launchesList.collect {
-                launchesAdapter.submitData(viewLifecycleOwner.lifecycle, it)
+            viewModel.launchesFlow.collect {
+                when (it) {
+                    is Resource.Error -> {
+                        hideProgressBar()
+                        Toast.makeText(
+                            requireContext(),
+                            "An error occurred: ${it.message}",
+                            Toast.LENGTH_LONG
+                        ).show()
+                        showErrorMessage(it.message.orEmpty())
+                    }
+                    is Resource.Loading -> {
+                        showProgressBar()
+                    }
+                    is Resource.Success -> {
+                        hideProgressBar()
+                        hideErrorMessage()
+                        if (it.data?.isEmpty() == true)
+                            showErrorMessage("Connect To Internet")
+                        else
+                            launchesAdapter.differ.submitList(it.data)
+                    }
+                }
             }
         }
 
@@ -70,7 +91,7 @@ class LaunchesListFragment : Fragment(R.layout.fragment_launches_list) {
         }
 
         binding.btnRetry.setOnClickListener {
-            launchesAdapter.refresh()
+            viewModel.getLaunchesList()
         }
     }
 
@@ -114,40 +135,69 @@ class LaunchesListFragment : Fragment(R.layout.fragment_launches_list) {
         ).show()
     }
 
-    private fun showProgressBar(visibility: Boolean) {
-        binding.paginationProgressBar.visibility = if (visibility) View.VISIBLE else View.INVISIBLE
+    private fun hideProgressBar() {
+        binding.paginationProgressBar.visibility = View.INVISIBLE
+        isLoading = false
     }
 
-    private fun showErrorMessage(visibility: Boolean, message: String = "") {
-        if (visibility) {
-            binding.itemErrorMessage.visibility = View.VISIBLE
-            binding.tvErrorMessage.text = message
-        } else {
-            binding.itemErrorMessage.visibility = View.INVISIBLE
+    private fun showProgressBar() {
+        binding.paginationProgressBar.visibility = View.VISIBLE
+        isLoading = true
+    }
+
+    private fun hideErrorMessage() {
+        binding.itemErrorMessage.visibility = View.INVISIBLE
+        isError = false
+    }
+
+    private fun showErrorMessage(message: String) {
+        binding.itemErrorMessage.visibility = View.VISIBLE
+        binding.tvErrorMessage.text = message
+        isError = true
+    }
+
+    var isError = false
+    var isLoading = false
+    var isLastPage = false
+    var isScrolling = false
+
+    val scrollListener = object : RecyclerView.OnScrollListener() {
+        override fun onScrolled(recyclerView: RecyclerView, dx: Int, dy: Int) {
+            super.onScrolled(recyclerView, dx, dy)
+
+            val layoutManager = recyclerView.layoutManager as LinearLayoutManager
+            val firstVisibleItemPosition = layoutManager.findFirstVisibleItemPosition()
+            val visibleItemCount = layoutManager.childCount
+            val totalItemCount = layoutManager.itemCount
+
+            val isNotLoadingAndNotLastPage = !isLoading && !isLastPage
+            val isAtLastItem = firstVisibleItemPosition + visibleItemCount >= totalItemCount
+            val isNotAtBeginning = firstVisibleItemPosition >= 0
+            val isTotalMoreThanVisible = totalItemCount >= QUERY_PAGE_SIZE
+            val shouldPaginate = isNotLoadingAndNotLastPage && isAtLastItem && isNotAtBeginning &&
+                    isTotalMoreThanVisible && isScrolling
+            if (shouldPaginate) {
+                viewModel.getLaunchesList()
+                isScrolling = false
+            } else {
+                binding.rvArticles.setPadding(0, 0, 0, 0)
+            }
+        }
+
+        override fun onScrollStateChanged(recyclerView: RecyclerView, newState: Int) {
+            super.onScrollStateChanged(recyclerView, newState)
+            if (newState == AbsListView.OnScrollListener.SCROLL_STATE_TOUCH_SCROLL) {
+                isScrolling = true
+            }
         }
     }
 
     private fun setupRecyclerView() {
         launchesAdapter = LaunchesAdapter()
-        launchesAdapter.addLoadStateListener {
-            showProgressBar(it.refresh is LoadState.Loading)
-            showErrorMessage(
-                it.refresh is LoadState.Error,
-                getString(R.string.failed_to_connect)
-            )
-        }
-
         binding.rvArticles.apply {
-            adapter = launchesAdapter.withLoadStateHeaderAndFooter(
-                header = LoaderAdapter {
-                    launchesAdapter.refresh()
-                },
-                footer = LoaderAdapter {
-                    launchesAdapter.refresh()
-                }
-            )
+            adapter = launchesAdapter
             layoutManager = LinearLayoutManager(activity)
-            setHasFixedSize(true)
+            addOnScrollListener(this@LaunchesListFragment.scrollListener)
         }
     }
 }

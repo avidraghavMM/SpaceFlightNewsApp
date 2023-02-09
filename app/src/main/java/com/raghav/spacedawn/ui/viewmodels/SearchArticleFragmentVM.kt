@@ -1,12 +1,10 @@
 package com.raghav.spacedawn.ui.viewmodels
 
-import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.raghav.spacedawn.models.spaceflightapi.ArticlesResponseItem
 import com.raghav.spacedawn.repository.AppRepository
 import com.raghav.spacedawn.utils.Resource
 import dagger.hilt.android.lifecycle.HiltViewModel
-import kotlinx.coroutines.Job
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.catch
@@ -16,14 +14,12 @@ import javax.inject.Inject
 @HiltViewModel
 class SearchArticleFragmentVM @Inject constructor(
     private val repository: AppRepository
-) : ViewModel() {
+) : BaseViewModel() {
 
     private val _searchArticlesFlow =
         MutableStateFlow<Resource<List<ArticlesResponseItem>>>(Resource.Success(emptyList()))
     val searchArticlesFlow = _searchArticlesFlow.asStateFlow()
     private var skipSearchArticle = 0
-
-    var job: Job? = null
 
     fun getSearchArticleList(searchQuery: String) {
         job?.cancel()
