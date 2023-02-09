@@ -18,8 +18,5 @@ class Constants {
         const val SPACE_FLIGHT_API = "space_flight_api"
         const val LAUNCH_LIBRARY_API = "retrofit_client_for_launch_library_api"
         const val DATABASE_NAME = "reminder_db.db"
-        const val DEBUG_BASE_URL_LAUNCHLIBRARY = "https://lldev.thespacedevs.com/2.2.0/launch/"
-        const val LAUNCHES_INCREMENT = 10
-        const val ARTICLES_INCREMENT = 10
     }
 }
