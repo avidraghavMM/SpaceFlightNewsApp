@@ -26,6 +26,8 @@ class ArticlesListFragment : Fragment(R.layout.fragment_articles_list) {
         const val TAG = "ArticlesListFragment"
     }
 
+    // Comment added for learning purpose
+
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
         binding = FragmentArticlesListBinding.bind(view)
