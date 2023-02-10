@@ -15,17 +15,17 @@ import androidx.recyclerview.widget.LinearLayoutManager
 import com.raghav.spacedawn.R
 import com.raghav.spacedawn.adapters.RemindersListAdapter
 import com.raghav.spacedawn.databinding.FragmentRemindersListBinding
-import com.raghav.spacedawn.db.ReminderModelClass
-import com.raghav.spacedawn.ui.AppViewModel
+import com.raghav.spacedawn.models.reminder.ReminderModelClass
+import com.raghav.spacedawn.ui.viewmodels.RemindersListFragmentVM
 import com.raghav.spacedawn.utils.AlarmBroadCastReciever
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.launch
 
 @AndroidEntryPoint
 class RemindersListFragment : Fragment(R.layout.fragment_reminders_list) {
-    private val viewModel by viewModels<AppViewModel>()
-    lateinit var binding: FragmentRemindersListBinding
-    lateinit var reminderListAdapter: RemindersListAdapter
+    private val viewModel by viewModels<RemindersListFragmentVM>()
+    private lateinit var binding: FragmentRemindersListBinding
+    private lateinit var reminderListAdapter: RemindersListAdapter
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)

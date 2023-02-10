@@ -1,13 +1,14 @@
 package com.raghav.spacedawn.models.spaceflightapi
 
+import androidx.room.Entity
+import androidx.room.PrimaryKey
 import java.io.Serializable
 
+@Entity(tableName = "articles")
 data class ArticlesResponseItem(
-    val events: List<Any>,
-    val featured: Boolean,
+    @PrimaryKey
     val id: Int,
     val imageUrl: String,
-    val launches: List<Launche>,
     val newsSite: String,
     val publishedAt: String,
     val summary: String,
