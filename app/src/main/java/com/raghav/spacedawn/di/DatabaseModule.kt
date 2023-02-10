@@ -2,7 +2,7 @@ package com.raghav.spacedawn.di
 
 import android.content.Context
 import androidx.room.Room
-import com.raghav.spacedawn.db.ReminderDatabase
+import com.raghav.spacedawn.db.AppDatabase
 import com.raghav.spacedawn.utils.Constants
 import dagger.Module
 import dagger.Provides
@@ -21,11 +21,7 @@ object DatabaseModule {
         @ApplicationContext context: Context
     ) = Room.databaseBuilder(
         context,
-        ReminderDatabase::class.java,
+        AppDatabase::class.java,
         Constants.DATABASE_NAME
     ).build()
-
-    @Singleton
-    @Provides
-    fun provideReminderDao(database: ReminderDatabase) = database.getRemindersDao()
 }

@@ -6,6 +6,7 @@ import androidx.room.Delete
 import androidx.room.Insert
 import androidx.room.OnConflictStrategy
 import androidx.room.Query
+import com.raghav.spacedawn.models.reminder.ReminderModelClass
 
 @Dao
 interface ReminderDao {
