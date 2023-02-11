@@ -7,7 +7,6 @@ import androidx.fragment.app.viewModels
 import androidx.lifecycle.lifecycleScope
 import androidx.navigation.fragment.findNavController
 import androidx.paging.LoadState
-import androidx.recyclerview.widget.LinearLayoutManager
 import com.raghav.spacedawn.R
 import com.raghav.spacedawn.adapters.ArticlesAdapter
 import com.raghav.spacedawn.databinding.FragmentArticlesListBinding
@@ -23,10 +22,8 @@ class ArticlesListFragment : Fragment(R.layout.fragment_articles_list) {
     private lateinit var binding: FragmentArticlesListBinding
 
     companion object {
-        const val TAG = "ArticlesListFragment"
+        private const val TAG = "ArticlesListFragment"
     }
-
-    // Comment added for learning purpose
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
@@ -72,7 +69,6 @@ class ArticlesListFragment : Fragment(R.layout.fragment_articles_list) {
                     articlesAdapter.refresh()
                 }
             )
-            layoutManager = LinearLayoutManager(activity)
         }
     }
 

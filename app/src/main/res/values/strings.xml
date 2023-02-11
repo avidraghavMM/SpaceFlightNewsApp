@@ -7,5 +7,7 @@
     <string name="ist">IST</string>
     <string name="failed_to_connect">Failed to connect</string>
     <string name="retry">Retry</string>
+    <string name="search">Search…</string>
+    <string name="reminder_cancelled">Reminder Cancelled</string>
 
 </resources>

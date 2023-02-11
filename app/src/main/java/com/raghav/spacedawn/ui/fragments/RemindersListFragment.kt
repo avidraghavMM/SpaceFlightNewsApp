@@ -9,7 +9,6 @@ import android.view.View
 import android.widget.Toast
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.viewModels
-import androidx.lifecycle.Observer
 import androidx.lifecycle.lifecycleScope
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.raghav.spacedawn.R
@@ -36,14 +35,13 @@ class RemindersListFragment : Fragment(R.layout.fragment_reminders_list) {
             cancelAlarm(it)
         }
         viewModel.getReminders().observe(
-            viewLifecycleOwner,
-            Observer {
-                if (it.isNullOrEmpty()) {
-                    binding.tvNoRemindersForNow.visibility = View.VISIBLE
-                }
-                reminderListAdapter.differ.submitList(it.reversed())
+            viewLifecycleOwner
+        ) {
+            if (it.isNullOrEmpty()) {
+                binding.tvNoRemindersForNow.visibility = View.VISIBLE
             }
-        )
+            reminderListAdapter.differ.submitList(it.reversed())
+        }
     }
 
     private fun cancelAlarm(reminder: ReminderModelClass) {
@@ -57,7 +55,7 @@ class RemindersListFragment : Fragment(R.layout.fragment_reminders_list) {
         )
         am.cancel(pi)
         pi.cancel()
-        Toast.makeText(activity, "Reminder Cancelled", Toast.LENGTH_LONG).show()
+        Toast.makeText(activity, getString(R.string.reminder_cancelled), Toast.LENGTH_LONG).show()
         lifecycleScope.launch {
             viewModel.deleteReminder(reminder)
         }

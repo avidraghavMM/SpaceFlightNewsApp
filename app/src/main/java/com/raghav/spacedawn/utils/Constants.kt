@@ -3,9 +3,6 @@ package com.raghav.spacedawn.utils
 class Constants {
     companion object {
         const val BASE_URL_SPACEFLIGHT = "https://api.spaceflightnewsapi.net/v3/"
-        const val BASE_URL_LAUNCHLIBRARY = "https://ll.thespacedevs.com/2.2.0/launch/"
-        const val QUERY_PAGE_SIZE = 10
-        const val DELAY_TIME = 700L
         const val ARTICLE_DATE_INPUT_FORMAT = "yyyy-MM-dd'T'HH:mm:ss.SSS'Z'"
         const val LAUNCH_DATE_INPUT_FORMAT = "yyyy-MM-dd'T'HH:mm:ss'Z'"
         const val DATE_OUTPUT_FORMAT = "MMMM dd,yyyy HH:mm z"
@@ -14,12 +11,13 @@ class Constants {
         const val NOTIFICATION_ID: Int = 0
         const val MinutestoMiliseconds: Long = 900000 // 15 minutes
         const val STATUS_SET = "Reminder Set"
-        const val STATUS_CANCELLED = "CANCELLED"
         const val SPACE_FLIGHT_API = "space_flight_api"
         const val LAUNCH_LIBRARY_API = "retrofit_client_for_launch_library_api"
         const val DATABASE_NAME = "reminder_db.db"
-        const val DEBUG_BASE_URL_LAUNCHLIBRARY = "https://lldev.thespacedevs.com/2.2.0/launch/"
         const val LAUNCHES_INCREMENT = 10
-        const val ARTICLES_INCREMENT = 10
+        const val SKIP_ARTICLES_COUNT = 10
+        const val SEARCH_DELAY_TIME = 3000L
+        const val REMINDER = "Reminder!"
+        const val REMINDER_SET = "Reminder to see the Rocket Launch set via Space Dawn"
     }
 }

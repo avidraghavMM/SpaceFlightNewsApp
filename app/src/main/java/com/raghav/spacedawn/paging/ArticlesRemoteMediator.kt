@@ -38,7 +38,7 @@ class ArticlesRemoteMediator(
                 // initial display of data
                 LoadType.REFRESH -> {
                     val keys = getKeyClosestToCurrentPosition(state)
-                    keys?.nextPage?.minus(Constants.ARTICLES_INCREMENT) ?: 0
+                    keys?.nextPage?.minus(Constants.SKIP_ARTICLES_COUNT) ?: 0
                 }
                 // when RecyclerView is scrolled upwards
                 LoadType.PREPEND -> {
@@ -57,7 +57,7 @@ class ArticlesRemoteMediator(
                     nextPage
                 }
             }
-            val response = api.getArticles(currentPage)
+            val response = api.getArticles(articlesToSkip = currentPage)
 
             // api call to get the articles available at the backend and hence calculate
             // whether further pagination can be done
@@ -66,12 +66,12 @@ class ArticlesRemoteMediator(
             // query param to fetch the preceding page is required when
             // RecyclerView is scrolled upwards
             val prevPage =
-                if (currentPage == 0) null else currentPage - Constants.ARTICLES_INCREMENT
+                if (currentPage == 0) null else currentPage - Constants.SKIP_ARTICLES_COUNT
 
             // query param to fetch the succeeding page is required when
             // RecyclerView is scrolled downwards
             val nextPage =
-                if (endOfPaginationReached) null else currentPage + Constants.ARTICLES_INCREMENT
+                if (endOfPaginationReached) null else currentPage + Constants.SKIP_ARTICLES_COUNT
 
             database.withTransaction {
                 // invalidate both keys and articles database during initial fetch

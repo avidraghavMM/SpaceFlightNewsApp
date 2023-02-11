@@ -2,42 +2,54 @@ package com.raghav.spacedawn.ui.viewmodels
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import androidx.paging.PagingData
+import androidx.paging.cachedIn
 import com.raghav.spacedawn.models.spaceflightapi.ArticlesResponseItem
 import com.raghav.spacedawn.repository.AppRepository
-import com.raghav.spacedawn.utils.Resource
+import com.raghav.spacedawn.utils.Constants
 import dagger.hilt.android.lifecycle.HiltViewModel
-import kotlinx.coroutines.Job
+import kotlinx.coroutines.FlowPreview
 import kotlinx.coroutines.flow.MutableStateFlow
-import kotlinx.coroutines.flow.asStateFlow
-import kotlinx.coroutines.flow.catch
+import kotlinx.coroutines.flow.StateFlow
+import kotlinx.coroutines.flow.debounce
 import kotlinx.coroutines.launch
 import javax.inject.Inject
 
+@OptIn(FlowPreview::class)
 @HiltViewModel
 class SearchArticleFragmentVM @Inject constructor(
     private val repository: AppRepository
 ) : ViewModel() {
 
-    private val _searchArticlesFlow =
-        MutableStateFlow<Resource<List<ArticlesResponseItem>>>(Resource.Success(emptyList()))
-    val searchArticlesFlow = _searchArticlesFlow.asStateFlow()
-    private var skipSearchArticle = 0
+    private var _searchArticlesList: MutableStateFlow<PagingData<ArticlesResponseItem>?> =
+        MutableStateFlow(null)
+    val searchArticlesList: StateFlow<PagingData<ArticlesResponseItem>?> get() = _searchArticlesList
 
-    var job: Job? = null
+    var query = MutableStateFlow("")
 
-    fun getSearchArticleList(searchQuery: String) {
-        job?.cancel()
-        job = viewModelScope.launch {
-            repository.searchArticle(searchQuery, skipSearchArticle)
-                .catch {
-                    _searchArticlesFlow.emit(Resource.Error("Error Occurred: ${it.localizedMessage}"))
+    init {
+        viewModelScope.launch {
+            query
+                .debounce(Constants.SEARCH_DELAY_TIME)
+                .collect {
+                    getSearchArticleList(it)
                 }
-                .collect { searchArticlesList ->
-                    skipSearchArticle += 10
-                    _searchArticlesFlow.emit(
-                        Resource.Success(searchArticlesList)
-                    )
+        }
+    }
+
+    private fun getSearchArticleList(searchQuery: String) {
+        viewModelScope.launch {
+            repository.searchArticle(searchQuery)
+                .cachedIn(this)
+                .collect {
+                    _searchArticlesList.emit(it)
                 }
+        }
+    }
+
+    fun setSearchQuery(searchQuery: String) {
+        viewModelScope.launch {
+            query.emit(searchQuery)
         }
     }
 }

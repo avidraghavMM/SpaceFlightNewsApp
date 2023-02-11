@@ -8,7 +8,6 @@ import android.content.Context
 import android.content.Context.NOTIFICATION_SERVICE
 import android.content.Intent
 import android.media.MediaPlayer
-import android.os.Build
 import android.provider.Settings
 import androidx.core.app.NotificationCompat
 import androidx.core.app.NotificationManagerCompat
@@ -34,8 +33,8 @@ class AlarmBroadCastReciever : BroadcastReceiver() {
         }
 
         val notification = NotificationCompat.Builder(p0!!, CHANNEL_ID)
-            .setContentTitle("Reminder!")
-            .setContentText("Reminder to see the Rocket Launch set via Space Dawn")
+            .setContentTitle(Constants.REMINDER)
+            .setContentText(Constants.REMINDER_SET)
             .setSmallIcon(R.drawable.ic_launch)
             .setContentIntent(pendingIntent)
             .build()
@@ -43,18 +42,16 @@ class AlarmBroadCastReciever : BroadcastReceiver() {
         notificationManager.notify(Constants.NOTIFICATION_ID, notification)
     }
 
-    fun createNotificationChannel(context: Context?) {
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
-            val channel = NotificationChannel(
-                CHANNEL_ID,
-                CHANNEL_NAME,
-                NotificationManager.IMPORTANCE_DEFAULT
-            )
-                .apply {
-                    // to do something like flash led etc.
-                }
-            val manager = context?.getSystemService(NOTIFICATION_SERVICE) as NotificationManager
-            manager.createNotificationChannel(channel)
-        }
+    private fun createNotificationChannel(context: Context?) {
+        val channel = NotificationChannel(
+            CHANNEL_ID,
+            CHANNEL_NAME,
+            NotificationManager.IMPORTANCE_DEFAULT
+        )
+            .apply {
+                // to do something like flash led etc.
+            }
+        val manager = context?.getSystemService(NOTIFICATION_SERVICE) as NotificationManager
+        manager.createNotificationChannel(channel)
     }
 }
