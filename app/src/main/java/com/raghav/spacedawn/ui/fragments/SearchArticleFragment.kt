@@ -14,6 +14,7 @@ import com.raghav.spacedawn.adapters.ArticlesAdapter
 import com.raghav.spacedawn.databinding.FragmentSearchArticleBinding
 import com.raghav.spacedawn.paging.LoaderAdapter
 import com.raghav.spacedawn.ui.viewmodels.SearchArticleFragmentVM
+import com.raghav.spacedawn.utils.Constants
 import dagger.hilt.android.AndroidEntryPoint
 
 @AndroidEntryPoint
@@ -34,7 +35,7 @@ class SearchArticleFragment : Fragment(R.layout.fragment_search_article) {
 
         articlesAdapter.setOnItemClickListener {
             val bundle = Bundle().apply {
-                putSerializable("article", it)
+                putSerializable(Constants.ARTICLE, it)
             }
             findNavController().navigate(
                 R.id.action_searchArticleFragment_to_articleDisplayFragment,

@@ -17,7 +17,6 @@ class Constants {
         const val LAUNCHES_INCREMENT = 10
         const val SKIP_ARTICLES_COUNT = 10
         const val SEARCH_DELAY_TIME = 3000L
-        const val REMINDER = "Reminder!"
-        const val REMINDER_SET = "Reminder to see the Rocket Launch set via Space Dawn"
+        const val ARTICLE = "article"
     }
 }

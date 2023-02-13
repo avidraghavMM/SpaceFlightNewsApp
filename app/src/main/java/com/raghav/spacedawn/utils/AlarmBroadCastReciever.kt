@@ -16,9 +16,13 @@ import com.raghav.spacedawn.R
 import com.raghav.spacedawn.ui.MainActivity
 import com.raghav.spacedawn.utils.Constants.Companion.CHANNEL_ID
 import com.raghav.spacedawn.utils.Constants.Companion.CHANNEL_NAME
+import dagger.hilt.android.qualifiers.ApplicationContext
 
 class AlarmBroadCastReciever : BroadcastReceiver() {
     lateinit var mediaPlayer: MediaPlayer
+
+    @ApplicationContext
+    lateinit var context: Context
     override fun onReceive(p0: Context?, p1: Intent?) {
         mediaPlayer = MediaPlayer.create(p0, Settings.System.DEFAULT_ALARM_ALERT_URI)
         mediaPlayer.start()
@@ -33,11 +37,9 @@ class AlarmBroadCastReciever : BroadcastReceiver() {
         }
 
         val notification = NotificationCompat.Builder(p0!!, CHANNEL_ID)
-            .setContentTitle(Constants.REMINDER)
-            .setContentText(Constants.REMINDER_SET)
-            .setSmallIcon(R.drawable.ic_launch)
-            .setContentIntent(pendingIntent)
-            .build()
+            .setContentTitle(context.getString(R.string.reminder))
+            .setContentText(context.getString(R.string.reminder_set_via_space_dawn))
+            .setSmallIcon(R.drawable.ic_launch).setContentIntent(pendingIntent).build()
         val notificationManager = NotificationManagerCompat.from(p0)
         notificationManager.notify(Constants.NOTIFICATION_ID, notification)
     }
@@ -47,10 +49,9 @@ class AlarmBroadCastReciever : BroadcastReceiver() {
             CHANNEL_ID,
             CHANNEL_NAME,
             NotificationManager.IMPORTANCE_DEFAULT
-        )
-            .apply {
-                // to do something like flash led etc.
-            }
+        ).apply {
+            // to do something like flash led etc.
+        }
         val manager = context?.getSystemService(NOTIFICATION_SERVICE) as NotificationManager
         manager.createNotificationChannel(channel)
     }
