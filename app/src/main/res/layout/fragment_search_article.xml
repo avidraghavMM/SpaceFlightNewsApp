@@ -9,13 +9,14 @@
         android:id="@+id/etSearch"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:hint="Search..."
+        android:hint="@string/search"
         android:textColor="#fff"
         android:textColorHint="@color/colorAccent"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintHorizontal_bias="0.5"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent" />
+        app:layout_constraintTop_toTopOf="parent"
+        tools:ignore="Autofill,TextFields" />
 
     <androidx.recyclerview.widget.RecyclerView
         android:id="@+id/rvSearchArticles"
@@ -49,7 +50,7 @@
                 android:layout_margin="16dp"
                 android:layout_weight="2"
                 android:gravity="center_horizontal"
-                android:text="Failed to connect"
+                android:text="@string/failed_to_connect"
                 android:textAlignment="center" />
 
             <Button
@@ -58,7 +59,7 @@
                 android:layout_height="wrap_content"
                 android:layout_margin="16dp"
                 android:layout_weight="1"
-                android:text="Retry" />
+                android:text="@string/retry" />
         </LinearLayout>
 
     </androidx.cardview.widget.CardView>

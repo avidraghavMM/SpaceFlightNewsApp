@@ -13,10 +13,9 @@ import com.raghav.spacedawn.network.LaunchLibrary
 import com.raghav.spacedawn.network.SpaceFlightAPI
 import com.raghav.spacedawn.paging.ArticlesRemoteMediator
 import com.raghav.spacedawn.paging.LaunchesRemoteMediator
-import com.raghav.spacedawn.utils.Helpers.Companion.isConnectedToNetwork
+import com.raghav.spacedawn.paging.SearchArticlesPagingSource
 import dagger.hilt.android.qualifiers.ApplicationContext
 import kotlinx.coroutines.flow.Flow
-import kotlinx.coroutines.flow.flow
 import javax.inject.Inject
 
 class AppRepository @Inject constructor(
@@ -25,6 +24,7 @@ class AppRepository @Inject constructor(
     private val launchLibrary: LaunchLibrary,
     private val database: AppDatabase
 ) {
+
     @OptIn(ExperimentalPagingApi::class)
     fun getArticles(): Flow<PagingData<ArticlesResponseItem>> {
         return Pager(
@@ -34,16 +34,20 @@ class AppRepository @Inject constructor(
         ).flow
     }
 
-    suspend fun searchArticle(
-        searchQuery: String,
-        skipArticles: Int
-    ): Flow<List<ArticlesResponseItem>> = flow {
-        val result = if (appContext.isConnectedToNetwork()) {
-            spaceFlightApi.searchArticles(searchQuery, skipArticles)
-        } else {
-            emptyList()
-        }
-        emit(result)
+    fun searchArticle(
+        searchQuery: String
+    ): Flow<PagingData<ArticlesResponseItem>> {
+        return Pager(
+            config = PagingConfig(
+                pageSize = 20
+            ),
+            pagingSourceFactory = {
+                SearchArticlesPagingSource(
+                    api = spaceFlightApi,
+                    query = searchQuery
+                )
+            }
+        ).flow
     }
 
     @OptIn(ExperimentalPagingApi::class)

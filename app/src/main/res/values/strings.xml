@@ -7,5 +7,9 @@
     <string name="ist">IST</string>
     <string name="failed_to_connect">Failed to connect</string>
     <string name="retry">Retry</string>
+    <string name="search">Search…</string>
+    <string name="reminder_cancelled">Reminder Cancelled</string>
+    <string name="reminder_set_via_space_dawn">Reminder to see the Rocket Launch set via Space Dawn</string>
+    <string name="reminder">Reminder!</string>
 
 </resources>
