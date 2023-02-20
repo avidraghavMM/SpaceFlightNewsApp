@@ -1,4 +1,4 @@
-package com.raghav.spacedawn.adapters
+package com.raghav.spacedawn.ui.fragments.launcheslist
 
 import android.graphics.Color
 import android.view.LayoutInflater
