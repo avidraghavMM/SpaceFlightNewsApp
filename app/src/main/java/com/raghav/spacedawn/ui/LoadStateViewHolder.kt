@@ -2,29 +2,32 @@ package com.raghav.spacedawn.ui
 
 import android.view.LayoutInflater
 import android.view.ViewGroup
-import androidx.core.view.isVisible
 import androidx.paging.LoadState
 import androidx.recyclerview.widget.RecyclerView
 import com.raghav.spacedawn.R
 import com.raghav.spacedawn.databinding.ItemLoadStateBinding
+import com.raghav.spacedawn.ui.common.ItemLoadState
 
 class LoadStateViewHolder(
     private val binding: ItemLoadStateBinding,
-    retryListener: () -> Unit
+    private val retryListener: () -> Unit
 ) :
     RecyclerView.ViewHolder(binding.root) {
 
-    init {
-        binding.btnRetry.setOnClickListener { retryListener.invoke() }
-    }
-
     fun bind(loadState: LoadState) {
-        if (loadState is LoadState.Error) {
-            binding.tvErrorMessage.text = loadState.error.localizedMessage
+        binding.composeView.setContent {
+            ItemLoadState(
+                message = if (loadState is LoadState.Error) {
+                    loadState.error.localizedMessage
+                } else {
+                    ""
+                },
+                isCtaVisible = loadState is LoadState.Error,
+                isProgressBarVisible = loadState is LoadState.Loading
+            ) {
+                retryListener()
+            }
         }
-        binding.paginationProgressBar.isVisible = loadState is LoadState.Loading
-        binding.btnRetry.isVisible = loadState is LoadState.Error
-        binding.tvErrorMessage.isVisible = loadState is LoadState.Error
     }
 
     companion object {
