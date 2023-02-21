@@ -11,5 +11,7 @@
     <string name="reminder_cancelled">Reminder Cancelled</string>
     <string name="reminder_set_via_space_dawn">Reminder to see the Rocket Launch set via Space Dawn</string>
     <string name="reminder">Reminder!</string>
-
+    <string name="add_reminder">Add a Reminder</string>
+    <string name="rocket">Rocket %s</string>
+    <string name="Status">Status</string>
 </resources>

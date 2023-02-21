@@ -5,12 +5,14 @@ import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.wrapContentWidth
 import androidx.compose.material.Card
 import androidx.compose.material.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.colorResource
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontWeight
@@ -18,6 +20,7 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import coil.compose.AsyncImage
+import coil.request.ImageRequest
 import com.raghav.spacedawn.R
 
 @Composable
@@ -57,13 +60,11 @@ fun ArticleImage(modifier: Modifier = Modifier, imageUrl: String) {
 @Composable
 fun ArticleTitle(modifier: Modifier = Modifier, title: String) {
     Text(
-        modifier = modifier
-            .padding(
-                start = 8.dp,
-                top = 8.dp,
-                end = 8.dp
-            )
-            .fillMaxWidth(),
+        modifier = modifier.padding(
+            start = 8.dp,
+            top = 8.dp,
+            end = 8.dp
+        ).fillMaxWidth(),
         text = title,
         color = colorResource(id = R.color.colorWhite),
         fontSize = 16.sp,
@@ -74,13 +75,11 @@ fun ArticleTitle(modifier: Modifier = Modifier, title: String) {
 @Composable
 fun ArticleDescription(modifier: Modifier = Modifier, description: String) {
     Text(
-        modifier = modifier
-            .padding(
-                start = 8.dp,
-                top = 16.dp,
-                end = 8.dp
-            )
-            .fillMaxWidth(),
+        modifier = modifier.padding(
+            start = 8.dp,
+            top = 16.dp,
+            end = 8.dp
+        ).fillMaxWidth(),
         text = description,
         color = colorResource(id = R.color.colorWhite),
         fontSize = 16.sp,
@@ -92,19 +91,14 @@ fun ArticleDescription(modifier: Modifier = Modifier, description: String) {
 fun ArticleFooter(modifier: Modifier = Modifier, source: String, publishedAt: String) {
     Row(modifier = modifier.fillMaxWidth(), horizontalArrangement = Arrangement.SpaceAround) {
         Text(
-            modifier = Modifier
-                .weight(1f)
-                .fillMaxWidth().padding(start = 8.dp, top = 4.dp),
+            modifier = Modifier.weight(1f).fillMaxWidth().padding(start = 8.dp, top = 4.dp),
             text = source,
             color = colorResource(id = R.color.colorWhite),
             fontSize = 16.sp,
             maxLines = 1
         )
         Text(
-            modifier = Modifier
-                .weight(1f)
-                .fillMaxWidth()
-                .wrapContentWidth(Alignment.End)
+            modifier = Modifier.weight(1f).fillMaxWidth().wrapContentWidth(Alignment.End)
                 .padding(start = 8.dp, top = 4.dp),
             text = publishedAt,
             fontSize = 16.sp,
@@ -113,15 +107,16 @@ fun ArticleFooter(modifier: Modifier = Modifier, source: String, publishedAt: St
     }
 }
 
-// preview not working with AsyncImage Composable
 @Preview
 @Composable
 fun ItemArticlePreview() {
     Column {
         AsyncImage(
-            model = painterResource(id = R.drawable.icon),
+            model = ImageRequest.Builder(LocalContext.current)
+                .data(R.drawable.icon)
+                .build(),
             contentDescription = null,
-            modifier = Modifier.fillMaxWidth()
+            modifier = Modifier.fillMaxWidth().size(50.dp)
         )
         ArticleTitle(title = "spaceX")
         ArticleDescription(description = "description")
