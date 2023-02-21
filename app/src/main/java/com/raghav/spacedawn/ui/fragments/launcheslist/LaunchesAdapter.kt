@@ -1,19 +1,13 @@
 package com.raghav.spacedawn.ui.fragments.launcheslist
 
-import android.graphics.Color
 import android.view.LayoutInflater
 import android.view.ViewGroup
 import androidx.paging.PagingDataAdapter
 import androidx.recyclerview.widget.DiffUtil
 import androidx.recyclerview.widget.RecyclerView
-import com.bumptech.glide.Glide
-import com.raghav.spacedawn.R
+import com.google.accompanist.themeadapter.material.MdcTheme
 import com.raghav.spacedawn.databinding.ItemLaunchPreviewBinding
 import com.raghav.spacedawn.models.launchlibrary.LaunchLibraryResponseItem
-import com.raghav.spacedawn.utils.Constants.Companion.DATE_OUTPUT_FORMAT
-import com.raghav.spacedawn.utils.Constants.Companion.LAUNCH_DATE_INPUT_FORMAT
-import com.raghav.spacedawn.utils.Helpers.Companion.formatTo
-import com.raghav.spacedawn.utils.Helpers.Companion.toDate
 
 class LaunchesAdapter : PagingDataAdapter<LaunchLibraryResponseItem, LaunchesAdapter.ViewHolder>(
     differCallBack
@@ -40,35 +34,12 @@ class LaunchesAdapter : PagingDataAdapter<LaunchLibraryResponseItem, LaunchesAda
 
         fun bind(launch: LaunchLibraryResponseItem) {
             binding.apply {
-                Glide.with(root)
-                    .load(launch.image)
-                    .placeholder(R.drawable.icon)
-                    .error(R.drawable.icon)
-                    .circleCrop()
-                    .into(ivLaunchImage)
-
-                tvAgency.text = launch.launch_service_provider.name
-                tvTitle.text = launch.name
-                tvRocketName.text = launch.rocket.configuration.full_name
-                binding.tvStatus.setTextColor(
-                    when (launch.status.name) {
-                        "To Be Determined" -> Color.RED
-                        "Go for Launch" -> Color.GREEN
-                        "To Be Confirmed" -> Color.YELLOW
-                        else -> Color.WHITE
+                composeView.setContent {
+                    MdcTheme {
+                        ItemLaunch(launch = launch) {
+                            onItemClickListener?.let { it(launch) }
+                        }
                     }
-                )
-
-                tvStatus.text = launch.status.name
-
-                tvLaunchDate.text = launch.net
-                    .toDate(LAUNCH_DATE_INPUT_FORMAT)
-                    .formatTo(
-                        DATE_OUTPUT_FORMAT
-                    )
-
-                btnSetAlarm.setOnClickListener {
-                    onItemClickListener?.let { it(launch) }
                 }
             }
         }
