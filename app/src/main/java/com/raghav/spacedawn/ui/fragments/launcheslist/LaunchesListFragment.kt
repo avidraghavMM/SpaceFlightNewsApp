@@ -1,4 +1,4 @@
-package com.raghav.spacedawn.ui.fragments
+package com.raghav.spacedawn.ui.fragments.launcheslist
 
 import android.app.AlarmManager
 import android.app.PendingIntent
@@ -13,7 +13,6 @@ import androidx.lifecycle.lifecycleScope
 import androidx.paging.LoadState
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.raghav.spacedawn.R
-import com.raghav.spacedawn.adapters.LaunchesAdapter
 import com.raghav.spacedawn.databinding.FragmentLaunchesListBinding
 import com.raghav.spacedawn.models.launchlibrary.LaunchLibraryResponseItem
 import com.raghav.spacedawn.models.reminder.ReminderModelClass

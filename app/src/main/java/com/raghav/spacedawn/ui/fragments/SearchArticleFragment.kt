@@ -10,9 +10,9 @@ import androidx.lifecycle.lifecycleScope
 import androidx.navigation.fragment.findNavController
 import androidx.paging.LoadState
 import com.raghav.spacedawn.R
-import com.raghav.spacedawn.adapters.ArticlesAdapter
 import com.raghav.spacedawn.databinding.FragmentSearchArticleBinding
 import com.raghav.spacedawn.paging.LoaderAdapter
+import com.raghav.spacedawn.ui.fragments.articleslist.ArticlesAdapter
 import com.raghav.spacedawn.ui.viewmodels.SearchArticleFragmentVM
 import com.raghav.spacedawn.utils.Constants
 import dagger.hilt.android.AndroidEntryPoint

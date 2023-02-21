@@ -1,4 +1,4 @@
-package com.raghav.spacedawn.ui.fragments
+package com.raghav.spacedawn.ui.fragments.articleslist
 
 import android.os.Bundle
 import android.view.View
@@ -8,7 +8,6 @@ import androidx.lifecycle.lifecycleScope
 import androidx.navigation.fragment.findNavController
 import androidx.paging.LoadState
 import com.raghav.spacedawn.R
-import com.raghav.spacedawn.adapters.ArticlesAdapter
 import com.raghav.spacedawn.databinding.FragmentArticlesListBinding
 import com.raghav.spacedawn.paging.LoaderAdapter
 import com.raghav.spacedawn.ui.viewmodels.ArticlesListFragmentVM

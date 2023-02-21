@@ -20,7 +20,7 @@
     </fragment>
     <fragment
         android:id="@+id/articlesListFragment"
-        android:name="com.raghav.spacedawn.ui.fragments.ArticlesListFragment"
+        android:name="com.raghav.spacedawn.ui.fragments.articleslist.ArticlesListFragment"
         android:label="fragment_articles_list"
         tools:layout="@layout/fragment_articles_list" >
         <action
@@ -41,7 +41,7 @@
     </fragment>
     <fragment
         android:id="@+id/launchesListFragment"
-        android:name="com.raghav.spacedawn.ui.fragments.LaunchesListFragment"
+        android:name="com.raghav.spacedawn.ui.fragments.launcheslist.LaunchesListFragment"
         android:label="LaunchesListFragment" >
         <action
             android:id="@+id/action_launchesListFragment_to_remindersListFragment"
@@ -49,7 +49,7 @@
     </fragment>
     <fragment
         android:id="@+id/remindersListFragment"
-        android:name="com.raghav.spacedawn.ui.fragments.RemindersListFragment"
+        android:name="com.raghav.spacedawn.ui.fragments.reminderlist.RemindersListFragment"
         android:label="RemindersListFragment" >
         <argument
             android:name="launchReminder"

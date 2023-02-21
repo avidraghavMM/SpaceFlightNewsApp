@@ -1,4 +1,4 @@
-package com.raghav.spacedawn.ui.fragments
+package com.raghav.spacedawn.ui.fragments.reminderlist
 
 import android.app.AlarmManager
 import android.app.PendingIntent
@@ -12,7 +12,6 @@ import androidx.fragment.app.viewModels
 import androidx.lifecycle.lifecycleScope
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.raghav.spacedawn.R
-import com.raghav.spacedawn.adapters.RemindersListAdapter
 import com.raghav.spacedawn.databinding.FragmentRemindersListBinding
 import com.raghav.spacedawn.models.reminder.ReminderModelClass
 import com.raghav.spacedawn.ui.viewmodels.RemindersListFragmentVM

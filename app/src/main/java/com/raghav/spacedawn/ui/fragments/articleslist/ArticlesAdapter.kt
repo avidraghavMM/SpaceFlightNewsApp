@@ -1,12 +1,11 @@
-package com.raghav.spacedawn.adapters
+package com.raghav.spacedawn.ui.fragments.articleslist
 
 import android.view.LayoutInflater
 import android.view.ViewGroup
 import androidx.paging.PagingDataAdapter
 import androidx.recyclerview.widget.DiffUtil
 import androidx.recyclerview.widget.RecyclerView
-import com.bumptech.glide.Glide
-import com.raghav.spacedawn.R
+import com.google.accompanist.themeadapter.material.MdcTheme
 import com.raghav.spacedawn.databinding.ItemArticlePreviewBinding
 import com.raghav.spacedawn.models.spaceflightapi.ArticlesResponseItem
 import com.raghav.spacedawn.utils.Constants
@@ -14,6 +13,7 @@ import com.raghav.spacedawn.utils.Constants.Companion.DATE_OUTPUT_FORMAT
 import com.raghav.spacedawn.utils.Helpers.Companion.formatTo
 import com.raghav.spacedawn.utils.Helpers.Companion.toDate
 
+// This adapter class is also used for RecylerView in SearchArticleFragment.kt
 class ArticlesAdapter : PagingDataAdapter<ArticlesResponseItem, ArticlesAdapter.ViewHolder>(
     differCallBack
 ) {
@@ -39,19 +39,19 @@ class ArticlesAdapter : PagingDataAdapter<ArticlesResponseItem, ArticlesAdapter.
 
         fun bind(article: ArticlesResponseItem) {
             binding.apply {
-                Glide.with(root)
-                    .load(article.imageUrl)
-                    .placeholder(R.drawable.icon)
-                    .error(R.drawable.icon)
-                    .into(ivArticleImage)
-
-                tvSource.text = article.newsSite
-                tvTitle.text = article.title
-                tvDescription.text = article.summary
-                tvPublishedAt.text = article.publishedAt
-                    .toDate(Constants.ARTICLE_DATE_INPUT_FORMAT)
-                    .formatTo(DATE_OUTPUT_FORMAT)
-
+                composeView.setContent {
+                    MdcTheme {
+                        ItemArticle(
+                            title = article.title,
+                            imageUrl = article.imageUrl,
+                            description = article.summary,
+                            source = article.newsSite,
+                            publishedAt = article.publishedAt
+                                .toDate(Constants.ARTICLE_DATE_INPUT_FORMAT)
+                                .formatTo(DATE_OUTPUT_FORMAT)
+                        )
+                    }
+                }
                 itemView.setOnClickListener {
                     onItemClickListener?.let { it(article) }
                 }
