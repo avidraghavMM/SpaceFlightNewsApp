@@ -1,5 +1,6 @@
 package com.raghav.spacedawn.ui.common
 
+import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Row
@@ -32,7 +33,7 @@ fun ItemLoadState(
 ) {
     Card(
         modifier,
-        shape = RoundedCornerShape(20.dp)
+        shape = RoundedCornerShape(24.dp)
     ) {
         // Box composable required to centre the
         // CircularProgressIndicator specifically
@@ -47,10 +48,16 @@ fun ItemLoadState(
                     modifier = Modifier.weight(0.65f).padding(16.dp).fillMaxWidth(),
                     textAlign = TextAlign.Center
                 )
-                if (isCtaVisible) {
+                AnimatedVisibility(
+                    visible = isCtaVisible,
+                    modifier = Modifier.weight(0.35f).padding(16.dp).fillMaxWidth()
+                ) {
                     OutlinedButton(
-                        modifier = Modifier.weight(0.35f).padding(16.dp).fillMaxWidth(),
-                        colors = ButtonDefaults.buttonColors(backgroundColor = colorResource(id = R.color.colorPrimaryDark)),
+                        colors = ButtonDefaults.buttonColors(
+                            backgroundColor = colorResource(
+                                id = R.color.colorPrimaryDark
+                            )
+                        ),
                         onClick = { ctaListener() }
                     ) {
                         Text(
