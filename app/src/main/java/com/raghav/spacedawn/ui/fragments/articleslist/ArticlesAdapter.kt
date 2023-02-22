@@ -8,10 +8,6 @@ import androidx.recyclerview.widget.RecyclerView
 import com.google.accompanist.themeadapter.material.MdcTheme
 import com.raghav.spacedawn.databinding.ItemArticlePreviewBinding
 import com.raghav.spacedawn.models.spaceflightapi.ArticlesResponseItem
-import com.raghav.spacedawn.utils.Constants
-import com.raghav.spacedawn.utils.Constants.Companion.DATE_OUTPUT_FORMAT
-import com.raghav.spacedawn.utils.Helpers.Companion.formatTo
-import com.raghav.spacedawn.utils.Helpers.Companion.toDate
 
 // This adapter class is also used for RecylerView in SearchArticleFragment.kt
 class ArticlesAdapter : PagingDataAdapter<ArticlesResponseItem, ArticlesAdapter.ViewHolder>(
@@ -42,13 +38,7 @@ class ArticlesAdapter : PagingDataAdapter<ArticlesResponseItem, ArticlesAdapter.
                 composeView.setContent {
                     MdcTheme {
                         ItemArticle(
-                            title = article.title,
-                            imageUrl = article.imageUrl,
-                            description = article.summary,
-                            source = article.newsSite,
-                            publishedAt = article.publishedAt
-                                .toDate(Constants.ARTICLE_DATE_INPUT_FORMAT)
-                                .formatTo(DATE_OUTPUT_FORMAT)
+                            article = article
                         )
                     }
                 }

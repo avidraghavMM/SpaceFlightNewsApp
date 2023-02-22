@@ -1,5 +1,6 @@
 package com.raghav.spacedawn.ui.fragments.articleslist
 
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
@@ -22,26 +23,29 @@ import androidx.compose.ui.unit.sp
 import coil.compose.AsyncImage
 import coil.request.ImageRequest
 import com.raghav.spacedawn.R
+import com.raghav.spacedawn.models.spaceflightapi.ArticlesResponseItem
+import com.raghav.spacedawn.utils.Constants
+import com.raghav.spacedawn.utils.Helpers.Companion.formatTo
+import com.raghav.spacedawn.utils.Helpers.Companion.toDate
 
 @Composable
 fun ItemArticle(
     modifier: Modifier = Modifier,
-    title: String,
-    imageUrl: String,
-    description: String,
-    source: String,
-    publishedAt: String
+    article: ArticlesResponseItem,
+    cardClickListener: (ArticlesResponseItem) -> Unit = {}
 ) {
     Card(
-        modifier = modifier.padding(16.dp),
+        modifier = modifier.padding(16.dp).clickable {
+            cardClickListener(article)
+        },
         backgroundColor = colorResource(id = R.color.colorPrimaryDark),
         elevation = 8.dp
     ) {
         Column {
-            ArticleImage(imageUrl = imageUrl)
-            ArticleTitle(title = title)
-            ArticleDescription(description = description)
-            ArticleFooter(source = source, publishedAt = publishedAt)
+            ArticleImage(imageUrl = article.imageUrl)
+            ArticleTitle(title = article.title)
+            ArticleDescription(description = article.summary)
+            ArticleFooter(source = article.newsSite, publishedAt = article.publishedAt)
         }
     }
 }
@@ -100,7 +104,9 @@ fun ArticleFooter(modifier: Modifier = Modifier, source: String, publishedAt: St
         Text(
             modifier = Modifier.weight(1f).fillMaxWidth().wrapContentWidth(Alignment.End)
                 .padding(start = 8.dp, top = 4.dp),
-            text = publishedAt,
+            text = publishedAt
+                .toDate(Constants.ARTICLE_DATE_INPUT_FORMAT)
+                .formatTo(Constants.DATE_OUTPUT_FORMAT),
             fontSize = 16.sp,
             maxLines = 1
         )
