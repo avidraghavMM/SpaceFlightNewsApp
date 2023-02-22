@@ -17,6 +17,7 @@ import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.colorResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import coil.compose.AsyncImage
@@ -34,7 +35,7 @@ fun ItemLaunch(
     onAdReminderClicked: () -> Unit = {}
 ) {
     Row(modifier) {
-        LaunchImage(imageUrl = launch.image)
+        CircularImage(imageUrl = launch.image, padding = Padding(start = 8.dp, top = 40.dp))
         LaunchDetails(
             title = launch.name,
             agency = launch.launch_service_provider.name,
@@ -139,12 +140,28 @@ fun LaunchDetails(
 }
 
 @Composable
-fun LaunchImage(modifier: Modifier = Modifier, imageUrl: String?) {
+fun CircularImage(
+    imageUrl: String?,
+    modifier: Modifier = Modifier,
+    padding: Padding = Padding()
+) {
     AsyncImage(
         model = ImageRequest.Builder(LocalContext.current).data(imageUrl).error(R.drawable.icon)
             .placeholder(R.drawable.icon).build(),
         contentDescription = null,
         contentScale = ContentScale.Crop,
-        modifier = modifier.padding(start = 8.dp, top = 40.dp).size(80.dp).clip(CircleShape)
+        modifier = modifier.padding(
+            start = padding.start,
+            top = padding.top,
+            end = padding.end,
+            bottom = padding.bottom
+        ).size(80.dp).clip(CircleShape)
     )
 }
+
+data class Padding(
+    val top: Dp = 0.dp,
+    val bottom: Dp = 0.dp,
+    val start: Dp = 0.dp,
+    val end: Dp = 0.dp
+)

@@ -14,4 +14,5 @@
     <string name="add_reminder">Add a Reminder</string>
     <string name="rocket">Rocket %s</string>
     <string name="Status">Status</string>
+    <string name="cancel_it">Cancel It?</string>
 </resources>
