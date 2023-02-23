@@ -90,6 +90,7 @@ dependencies {
 
     // Paging-3
     implementation "androidx.paging:paging-runtime-ktx:3.1.1"
+    implementation "androidx.paging:paging-compose:1.0.0-alpha17"
 
     // Compose
     def composeBom = platform('androidx.compose:compose-bom:2022.10.00')
