@@ -19,4 +19,5 @@
     <string name="loading">Loading…</string>
     <string name="already_set">Already Set</string>
     <string name="reminder_set_for_launch">"Reminder set for 15 minutes prior to launch time"</string>
+    <string name="set_reminders_from_launches_tab">Set Reminders from Launches Tab</string>
 </resources>
