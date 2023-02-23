@@ -17,4 +17,6 @@
     <string name="cancel_it">Cancel It?</string>
     <string name="refreshing">Refreshing…</string>
     <string name="loading">Loading…</string>
+    <string name="already_set">Already Set</string>
+    <string name="reminder_set_for_launch">"Reminder set for 15 minutes prior to launch time"</string>
 </resources>
