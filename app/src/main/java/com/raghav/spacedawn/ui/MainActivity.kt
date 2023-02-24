@@ -8,6 +8,7 @@ import android.os.Bundle
 import android.view.MenuItem
 import androidx.appcompat.app.ActionBarDrawerToggle
 import androidx.appcompat.app.AppCompatActivity
+import androidx.browser.customtabs.CustomTabsIntent
 import androidx.navigation.findNavController
 import androidx.navigation.ui.setupWithNavController
 import com.raghav.spacedawn.R
@@ -32,6 +33,7 @@ class MainActivity : AppCompatActivity() {
         supportActionBar?.setDisplayHomeAsUpEnabled(true)
         binding.navMenu.itemIconTintList = null
         binding.navMenu.setNavigationItemSelectedListener {
+            val customTabIntent = CustomTabsIntent.Builder().build()
             when (it.itemId) {
                 R.id.rate_on_playstore ->
                     try {
@@ -42,29 +44,25 @@ class MainActivity : AppCompatActivity() {
                             )
                         )
                     } catch (e: ActivityNotFoundException) {
-                        startActivity(
-                            Intent(
-                                ACTION_VIEW,
-                                Uri.parse("http://play.google.com/store/apps/details?id=$packageName")
-                            )
+                        customTabIntent.launchUrl(
+                            this,
+                            Uri.parse("http://play.google.com/store/apps/details?id=$packageName")
                         )
                     }
-                R.id.github_repo ->
-                    startActivity(
-                        Intent(
-                            ACTION_VIEW,
-                            Uri.parse("https://github.com/avidraghav/SpaceFlightNewsApp")
-                        )
+                R.id.github_repo -> {
+                    customTabIntent.launchUrl(
+                        this,
+                        Uri.parse("https://github.com/avidraghav/SpaceFlightNewsApp")
                     )
+                }
 
-                R.id.qsol_playstore_link -> startActivity(
-                    Intent(
-                        ACTION_VIEW,
+                R.id.qsol_playstore_link -> {
+                    customTabIntent.launchUrl(
+                        this,
                         Uri.parse("https://play.google.com/store/apps/details?id=com.application.kurukshetrauniversitypapers")
                     )
-                )
+                }
             }
-
             true
         }
     }

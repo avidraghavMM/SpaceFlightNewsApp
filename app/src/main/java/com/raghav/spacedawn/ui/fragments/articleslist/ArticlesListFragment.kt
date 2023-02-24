@@ -1,10 +1,11 @@
 package com.raghav.spacedawn.ui.fragments.articleslist
 
+import android.net.Uri
 import android.os.Bundle
 import android.view.View
+import androidx.browser.customtabs.CustomTabsIntent
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.viewModels
-import androidx.navigation.fragment.findNavController
 import com.google.accompanist.themeadapter.material.MdcTheme
 import com.raghav.spacedawn.R
 import com.raghav.spacedawn.databinding.FragmentArticlesListBinding
@@ -28,13 +29,8 @@ class ArticlesListFragment : Fragment(R.layout.fragment_articles_list) {
         binding.composeView.setContent {
             MdcTheme {
                 ArticlesList(viewModel) {
-                    val bundle = Bundle().apply {
-                        putSerializable("article", it)
-                    }
-                    findNavController().navigate(
-                        R.id.action_articlesListFragment_to_articleDisplayFragment,
-                        bundle
-                    )
+                    val customTabIntent = CustomTabsIntent.Builder().build()
+                    customTabIntent.launchUrl(requireContext(), Uri.parse(it.url))
                 }
             }
         }
