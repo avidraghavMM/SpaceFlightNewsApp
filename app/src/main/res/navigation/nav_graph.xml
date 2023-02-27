@@ -7,7 +7,7 @@
 
     <fragment
         android:id="@+id/searchArticleFragment"
-        android:name="com.raghav.spacedawn.ui.fragments.SearchArticleFragment"
+        android:name="com.raghav.spacedawn.ui.fragments.searcharticles.SearchArticleFragment"
         android:label="fragment_search_article"
         tools:layout="@layout/fragment_search_article" >
         <action

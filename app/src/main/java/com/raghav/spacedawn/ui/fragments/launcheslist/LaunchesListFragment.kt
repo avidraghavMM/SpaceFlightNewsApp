@@ -10,13 +10,10 @@ import android.widget.Toast
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.viewModels
 import androidx.lifecycle.lifecycleScope
-import androidx.paging.LoadState
-import androidx.recyclerview.widget.LinearLayoutManager
 import com.raghav.spacedawn.R
 import com.raghav.spacedawn.databinding.FragmentLaunchesListBinding
 import com.raghav.spacedawn.models.launchlibrary.LaunchLibraryResponseItem
 import com.raghav.spacedawn.models.reminder.ReminderModelClass
-import com.raghav.spacedawn.paging.LoaderAdapter
 import com.raghav.spacedawn.ui.viewmodels.LaunchesListFragmentVM
 import com.raghav.spacedawn.utils.AlarmBroadCastReciever
 import com.raghav.spacedawn.utils.Constants
@@ -34,7 +31,7 @@ import kotlinx.coroutines.withContext
 class LaunchesListFragment : Fragment(R.layout.fragment_launches_list) {
 
     private val viewModel by viewModels<LaunchesListFragmentVM>()
-    private lateinit var launchesAdapter: LaunchesAdapter
+
     private lateinit var binding: FragmentLaunchesListBinding
 
     companion object {
@@ -44,32 +41,27 @@ class LaunchesListFragment : Fragment(R.layout.fragment_launches_list) {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
         binding = FragmentLaunchesListBinding.bind(view)
-        setupRecyclerView()
 
-        viewLifecycleOwner.lifecycleScope.launchWhenStarted {
-            viewModel.launchesList.collect {
-                launchesAdapter.submitData(viewLifecycleOwner.lifecycle, it)
-            }
-        }
-
-        launchesAdapter.setOnItemClickListener {
-            val dateTime = it.net.toDate(Constants.LAUNCH_DATE_INPUT_FORMAT)
-            CoroutineScope(Dispatchers.IO).launch {
-                if (viewModel.getLaunchId(it.id)) {
-                    withContext(Dispatchers.Main) {
-                        Toast.makeText(activity, "Already Set", Toast.LENGTH_LONG).show()
-                    }
-                } else {
-                    withContext(Dispatchers.Main) {
-                        val timeToSetAlarm: Long = dateTime.time - MinutestoMiliseconds
-                        setAlarm(timeToSetAlarm, System.currentTimeMillis().toInt(), it)
+        binding.composeView.setContent {
+            LaunchesList(viewModel) { launch ->
+                val dateTime = launch.net.toDate(Constants.LAUNCH_DATE_INPUT_FORMAT)
+                CoroutineScope(Dispatchers.IO).launch {
+                    if (viewModel.getLaunchId(launch.id)) {
+                        withContext(Dispatchers.Main) {
+                            Toast.makeText(
+                                activity,
+                                getString(R.string.already_set),
+                                Toast.LENGTH_LONG
+                            ).show()
+                        }
+                    } else {
+                        withContext(Dispatchers.Main) {
+                            val timeToSetAlarm: Long = dateTime.time - MinutestoMiliseconds
+                            setAlarm(timeToSetAlarm, System.currentTimeMillis().toInt(), launch)
+                        }
                     }
                 }
             }
-        }
-
-        binding.btnRetry.setOnClickListener {
-            launchesAdapter.refresh()
         }
     }
 
@@ -108,45 +100,8 @@ class LaunchesListFragment : Fragment(R.layout.fragment_launches_list) {
         am.setExact(AlarmManager.RTC_WAKEUP, timeInMilliseconds, pi)
         Toast.makeText(
             activity,
-            "Reminder set for 15 minutes prior to launch time",
+            getString(R.string.reminder_set_for_launch),
             Toast.LENGTH_LONG
         ).show()
-    }
-
-    private fun showProgressBar(visibility: Boolean) {
-        binding.paginationProgressBar.visibility = if (visibility) View.VISIBLE else View.INVISIBLE
-    }
-
-    private fun showErrorMessage(visibility: Boolean, message: String = "") {
-        if (visibility) {
-            binding.itemErrorMessage.visibility = View.VISIBLE
-            binding.tvErrorMessage.text = message
-        } else {
-            binding.itemErrorMessage.visibility = View.INVISIBLE
-        }
-    }
-
-    private fun setupRecyclerView() {
-        launchesAdapter = LaunchesAdapter()
-        launchesAdapter.addLoadStateListener {
-            showProgressBar(it.refresh is LoadState.Loading)
-            showErrorMessage(
-                it.refresh is LoadState.Error,
-                getString(R.string.failed_to_connect)
-            )
-        }
-
-        binding.rvArticles.apply {
-            adapter = launchesAdapter.withLoadStateHeaderAndFooter(
-                header = LoaderAdapter {
-                    launchesAdapter.refresh()
-                },
-                footer = LoaderAdapter {
-                    launchesAdapter.refresh()
-                }
-            )
-            layoutManager = LinearLayoutManager(activity)
-            setHasFixedSize(true)
-        }
     }
 }

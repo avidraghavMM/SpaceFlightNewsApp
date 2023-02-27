@@ -32,20 +32,14 @@ import com.raghav.spacedawn.utils.Helpers.Companion.toDate
 fun ItemLaunch(
     modifier: Modifier = Modifier,
     launch: LaunchLibraryResponseItem,
-    onAdReminderClicked: () -> Unit = {}
+    onAdReminderClicked: (LaunchLibraryResponseItem) -> Unit = {}
 ) {
     Row(modifier) {
         CircularImage(imageUrl = launch.image, padding = Padding(start = 8.dp, top = 40.dp))
         LaunchDetails(
-            title = launch.name,
-            agency = launch.launch_service_provider.name,
-            rocket = launch.rocket.configuration.full_name,
-            status = launch.status.name,
-            launchDate = launch.net.toDate(Constants.LAUNCH_DATE_INPUT_FORMAT).formatTo(
-                Constants.DATE_OUTPUT_FORMAT
-            )
+            launch = launch
         ) {
-            onAdReminderClicked()
+            onAdReminderClicked(it)
         }
     }
 }
@@ -53,12 +47,8 @@ fun ItemLaunch(
 @Composable
 fun LaunchDetails(
     modifier: Modifier = Modifier,
-    title: String,
-    agency: String,
-    rocket: String,
-    status: String,
-    launchDate: String,
-    onAdReminderClicked: () -> Unit
+    launch: LaunchLibraryResponseItem,
+    onAdReminderClicked: (LaunchLibraryResponseItem) -> Unit
 ) {
     Column(modifier) {
         Text(
@@ -69,14 +59,14 @@ fun LaunchDetails(
             color = colorResource(id = R.color.colorWhite),
             fontSize = 16.sp,
             fontWeight = FontWeight.Bold,
-            text = title
+            text = launch.name
         )
         Text(
             modifier = Modifier.padding(
                 start = 8.dp
             ),
             color = colorResource(id = R.color.colorWhite),
-            text = agency
+            text = launch.launch_service_provider.name
         )
         Text(
             modifier = Modifier.padding(
@@ -85,7 +75,7 @@ fun LaunchDetails(
             ),
             fontSize = 16.sp,
             color = colorResource(id = R.color.colorWhite),
-            text = stringResource(id = R.string.rocket, rocket)
+            text = stringResource(id = R.string.rocket, launch.rocket.configuration.full_name)
         )
 
         Row {
@@ -104,13 +94,13 @@ fun LaunchDetails(
                     top = 8.dp
                 ),
                 fontSize = 16.sp,
-                color = when (status) {
+                color = when (launch.status.name) {
                     "To Be Determined" -> Color.Red
                     "Go for Launch" -> Color.Green
                     "To Be Confirmed" -> Color.Yellow
                     else -> Color.White
                 },
-                text = status
+                text = launch.status.name
             )
         }
 
@@ -122,13 +112,16 @@ fun LaunchDetails(
             color = colorResource(id = R.color.colorWhite),
             fontSize = 16.sp,
             fontWeight = FontWeight.Bold,
-            text = launchDate
+            text = launch.net.toDate(Constants.LAUNCH_DATE_INPUT_FORMAT).formatTo(
+                Constants.DATE_OUTPUT_FORMAT
+            )
         )
+
         OutlinedButton(
             modifier = Modifier.padding(
                 start = 8.dp
             ),
-            onClick = { onAdReminderClicked() },
+            onClick = { onAdReminderClicked(launch) },
             colors = ButtonDefaults.buttonColors(backgroundColor = colorResource(id = R.color.colorAccent))
         ) {
             Text(
