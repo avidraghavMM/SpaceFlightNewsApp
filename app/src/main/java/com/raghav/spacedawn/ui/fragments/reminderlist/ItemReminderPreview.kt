@@ -14,21 +14,18 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.colorResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
-import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import com.google.accompanist.themeadapter.material.MdcTheme
 import com.raghav.spacedawn.R
+import com.raghav.spacedawn.models.reminder.ReminderModelClass
 import com.raghav.spacedawn.ui.fragments.launcheslist.CircularImage
 import com.raghav.spacedawn.ui.fragments.launcheslist.Padding
 
 @Composable
 fun ItemReminder(
-    imageUrl: String?,
-    title: String,
-    launchDate: String,
+    reminder: ReminderModelClass,
     modifier: Modifier = Modifier,
-    ctaListener: () -> Unit = {}
+    cancelReminderListener: (ReminderModelClass) -> Unit = {}
 ) {
     Card(
         modifier.padding(top = 8.dp, bottom = 8.dp),
@@ -38,9 +35,9 @@ fun ItemReminder(
         )
     ) {
         Row(modifier = Modifier.fillMaxWidth()) {
-            CircularImage(imageUrl = imageUrl, padding = Padding(start = 8.dp, top = 8.dp))
-            ReminderDetails(title, launchDate) {
-                ctaListener()
+            CircularImage(imageUrl = reminder.image, padding = Padding(start = 8.dp, top = 8.dp))
+            ReminderDetails(reminder) {
+                cancelReminderListener(reminder)
             }
         }
     }
@@ -48,37 +45,40 @@ fun ItemReminder(
 
 @Composable
 fun ReminderDetails(
-    title: String,
-    launchDate: String,
+    reminder: ReminderModelClass,
     modifier: Modifier = Modifier,
-    cancelButtonClicked: () -> Unit = {}
+    cancelButtonClicked: (ReminderModelClass) -> Unit = {}
 ) {
     Column(modifier) {
         Text(
-            modifier = Modifier.padding(
-                start = 8.dp,
-                top = 8.dp
-            ).fillMaxWidth(),
+            modifier = Modifier
+                .padding(
+                    start = 8.dp,
+                    top = 8.dp
+                )
+                .fillMaxWidth(),
             color = colorResource(id = R.color.colorWhite),
             fontSize = 16.sp,
             fontWeight = FontWeight.Bold,
-            text = title
+            text = reminder.name
         )
         Text(
-            modifier = Modifier.padding(
-                start = 8.dp,
-                top = 8.dp
-            ).fillMaxWidth(),
+            modifier = Modifier
+                .padding(
+                    start = 8.dp,
+                    top = 8.dp
+                )
+                .fillMaxWidth(),
             color = colorResource(id = R.color.colorWhite),
             fontWeight = FontWeight.Bold,
-            text = launchDate
+            text = reminder.dateTime
         )
 
         OutlinedButton(
             modifier = Modifier.padding(
                 start = 8.dp
             ),
-            onClick = { cancelButtonClicked() },
+            onClick = { cancelButtonClicked(reminder) },
             colors = ButtonDefaults.buttonColors(backgroundColor = Color.Red)
         ) {
             Text(
@@ -86,13 +86,5 @@ fun ReminderDetails(
                 text = stringResource(id = R.string.cancel_it)
             )
         }
-    }
-}
-
-@Preview
-@Composable
-fun ItemReminderPreview() {
-    MdcTheme {
-        ItemReminder(imageUrl = null, title = "title", launchDate = "launch date")
     }
 }
