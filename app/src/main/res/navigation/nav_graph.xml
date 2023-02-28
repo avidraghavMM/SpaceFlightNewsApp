@@ -9,40 +9,16 @@
         android:id="@+id/searchArticleFragment"
         android:name="com.raghav.spacedawn.ui.fragments.searcharticles.SearchArticleFragment"
         android:label="fragment_search_article"
-        tools:layout="@layout/fragment_search_article" >
-        <action
-            android:id="@+id/action_searchArticleFragment_to_articleDisplayFragment"
-            app:destination="@id/articleDisplayFragment"
-            app:enterAnim="@anim/slide_in_right"
-            app:exitAnim="@anim/slide_out_left"
-            app:popEnterAnim="@anim/slide_in_left"
-            app:popExitAnim="@anim/slide_out_right"/>
-    </fragment>
+        tools:layout="@layout/fragment_search_article" />
     <fragment
         android:id="@+id/articlesListFragment"
         android:name="com.raghav.spacedawn.ui.fragments.articleslist.ArticlesListFragment"
         android:label="fragment_articles_list"
-        tools:layout="@layout/fragment_articles_list" >
-        <action
-            android:id="@+id/action_articlesListFragment_to_articleDisplayFragment"
-            app:destination="@id/articleDisplayFragment"
-            app:enterAnim="@anim/slide_in_right"
-            app:exitAnim="@anim/slide_out_left"
-            app:popEnterAnim="@anim/slide_in_left"
-            app:popExitAnim="@anim/slide_out_right"/>
-    </fragment>
-    <fragment
-        android:id="@+id/articleDisplayFragment"
-        android:name="com.raghav.spacedawn.ui.fragments.ArticleDisplayFragment"
-        android:label="ArticleDisplayFragment">
-        <argument
-            android:name="article"
-            app:argType="com.raghav.spacedawn.models.spaceflightapi.ArticlesResponseItem" />
-    </fragment>
+        tools:layout="@layout/fragment_articles_list" />
     <fragment
         android:id="@+id/launchesListFragment"
         android:name="com.raghav.spacedawn.ui.fragments.launcheslist.LaunchesListFragment"
-        android:label="LaunchesListFragment" >
+        android:label="LaunchesListFragment">
         <action
             android:id="@+id/action_launchesListFragment_to_remindersListFragment"
             app:destination="@id/remindersListFragment" />
@@ -50,7 +26,7 @@
     <fragment
         android:id="@+id/remindersListFragment"
         android:name="com.raghav.spacedawn.ui.fragments.reminderlist.RemindersListFragment"
-        android:label="RemindersListFragment" >
+        android:label="RemindersListFragment">
         <argument
             android:name="launchReminder"
             app:argType="com.raghav.spacedawn.models.launchlibrary.LaunchLibraryResponseItem" />

@@ -5,16 +5,16 @@
 
     <item
         android:id="@+id/github_repo"
-        android:title="Github Repository"
-        android:icon ="@drawable/ic_githubrepo"/>
+        android:icon="@drawable/ic_githubrepo"
+        android:title="@string/github_repository" />
     <item
         android:id="@+id/rate_on_playstore"
         android:icon="@drawable/ic_customer_review"
-        android:title="Rate Dawn Rocket" />
+        android:title="@string/rate_space_dawn" />
     <item
         android:id="@+id/qsol_playstore_link"
         android:icon="@drawable/ic_solution_new"
-        android:title="More apps from the developer" />
+        android:title="@string/more_apps_from_the_developer" />
 
 
 </menu>
