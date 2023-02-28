@@ -1,10 +1,11 @@
 package com.raghav.spacedawn.ui.fragments.searcharticles
 
+import android.net.Uri
 import android.os.Bundle
 import android.view.View
+import androidx.browser.customtabs.CustomTabsIntent
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.viewModels
-import androidx.navigation.fragment.findNavController
 import com.raghav.spacedawn.R
 import com.raghav.spacedawn.databinding.FragmentSearchArticleBinding
 import com.raghav.spacedawn.ui.viewmodels.SearchArticleFragmentVM
@@ -28,13 +29,8 @@ class SearchArticleFragment : Fragment(R.layout.fragment_search_article) {
             SearchArticleScreen(
                 viewModel = viewModel
             ) {
-                val bundle = Bundle().apply {
-                    putSerializable("article", it)
-                }
-                findNavController().navigate(
-                    R.id.action_searchArticleFragment_to_articleDisplayFragment,
-                    bundle
-                )
+                val customTabIntent = CustomTabsIntent.Builder().build()
+                customTabIntent.launchUrl(requireContext(), Uri.parse(it.url))
             }
         }
     }

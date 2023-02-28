@@ -16,7 +16,5 @@ class Constants {
         const val DATABASE_NAME = "reminder_db.db"
         const val LAUNCHES_INCREMENT = 10
         const val SKIP_ARTICLES_COUNT = 10
-        const val SEARCH_DELAY_TIME = 3000L
-        const val ARTICLE = "article"
     }
 }
