@@ -1,21 +1,19 @@
 package com.raghav.spacedawn.ui.fragments.articleslist
 
-import android.net.Uri
 import android.os.Bundle
 import android.view.View
-import androidx.browser.customtabs.CustomTabsIntent
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.viewModels
 import com.google.accompanist.themeadapter.material.MdcTheme
 import com.raghav.spacedawn.R
 import com.raghav.spacedawn.databinding.FragmentArticlesListBinding
-import com.raghav.spacedawn.ui.viewmodels.ArticlesListFragmentVM
+import com.raghav.spacedawn.ui.viewmodels.ArticlesListVM
 import dagger.hilt.android.AndroidEntryPoint
 
 @AndroidEntryPoint
 class ArticlesListFragment : Fragment(R.layout.fragment_articles_list) {
 
-    private val viewModel by viewModels<ArticlesListFragmentVM>()
+    private val viewModel by viewModels<ArticlesListVM>()
     private lateinit var binding: FragmentArticlesListBinding
 
     companion object {
@@ -28,10 +26,10 @@ class ArticlesListFragment : Fragment(R.layout.fragment_articles_list) {
 
         binding.composeView.setContent {
             MdcTheme {
-                ArticlesList(viewModel) {
-                    val customTabIntent = CustomTabsIntent.Builder().build()
-                    customTabIntent.launchUrl(requireContext(), Uri.parse(it.url))
-                }
+//               ArticlesList(viewModel) {
+//                    val customTabIntent = CustomTabsIntent.Builder().build()
+//                    customTabIntent.launchUrl(requireContext(), Uri.parse(it.url))
+//                }
             }
         }
     }

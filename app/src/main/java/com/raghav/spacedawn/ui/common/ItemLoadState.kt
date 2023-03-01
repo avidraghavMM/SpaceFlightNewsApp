@@ -22,6 +22,7 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import com.google.accompanist.themeadapter.material.MdcTheme
 import com.raghav.spacedawn.R
+import com.raghav.spacedawn.ui.spacing
 
 @Composable
 fun ItemLoadState(
@@ -45,12 +46,12 @@ fun ItemLoadState(
             ) {
                 Text(
                     text = message,
-                    modifier = Modifier.weight(0.65f).padding(16.dp).fillMaxWidth(),
+                    modifier = Modifier.weight(0.65f).padding(spacing.large).fillMaxWidth(),
                     textAlign = TextAlign.Center
                 )
                 AnimatedVisibility(
                     visible = isCtaVisible,
-                    modifier = Modifier.weight(0.35f).padding(16.dp).fillMaxWidth()
+                    modifier = Modifier.weight(0.35f).padding(spacing.large).fillMaxWidth()
                 ) {
                     OutlinedButton(
                         colors = ButtonDefaults.buttonColors(

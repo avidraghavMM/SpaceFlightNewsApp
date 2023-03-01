@@ -5,7 +5,13 @@ import androidx.compose.animation.animateColorAsState
 import androidx.compose.animation.animateContentSize
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.interaction.MutableInteractionSource
-import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.selection.selectableGroup
 import androidx.compose.material.Icon
 import androidx.compose.material.Surface
@@ -25,6 +31,8 @@ import androidx.compose.ui.semantics.semantics
 import androidx.compose.ui.unit.Dp
 import com.raghav.spacedawn.R
 import com.raghav.spacedawn.navigation.Destination
+import com.raghav.spacedawn.ui.height
+import com.raghav.spacedawn.ui.spacing
 
 @Composable
 fun BottomNavigationBar(
@@ -40,7 +48,7 @@ fun BottomNavigationBar(
         Row(
             Modifier
                 .selectableGroup()
-                .padding(start = LocalSpacing.current.large, end = LocalSpacing.current.large),
+                .padding(start = spacing.large, end = spacing.large),
             horizontalArrangement = Arrangement.SpaceBetween
         ) {
             allScreens.forEach { screen ->

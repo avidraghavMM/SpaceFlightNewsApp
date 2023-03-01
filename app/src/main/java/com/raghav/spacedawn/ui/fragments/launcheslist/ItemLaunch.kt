@@ -24,7 +24,7 @@ import coil.compose.AsyncImage
 import coil.request.ImageRequest
 import com.raghav.spacedawn.R
 import com.raghav.spacedawn.models.launchlibrary.LaunchLibraryResponseItem
-import com.raghav.spacedawn.ui.common.spacing
+import com.raghav.spacedawn.ui.spacing
 import com.raghav.spacedawn.utils.Constants
 import com.raghav.spacedawn.utils.Helpers.Companion.formatTo
 import com.raghav.spacedawn.utils.Helpers.Companion.toDate
@@ -38,7 +38,7 @@ fun ItemLaunch(
     Row(modifier) {
         CircularImage(
             imageUrl = launch.image,
-            padding = Padding(start = spacing.medium, top = 40.dp)
+            padding = Padding(start = spacing.medium, top = spacing.extraLarge)
         )
         LaunchDetails(
             launch = launch
