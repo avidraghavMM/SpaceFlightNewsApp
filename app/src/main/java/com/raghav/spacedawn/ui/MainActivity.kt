@@ -20,7 +20,11 @@ import androidx.navigation.compose.currentBackStackEntryAsState
 import androidx.navigation.compose.rememberNavController
 import com.google.accompanist.themeadapter.material.MdcTheme
 import com.raghav.spacedawn.R
-import com.raghav.spacedawn.navigation.*
+import com.raghav.spacedawn.navigation.ArticlesList
+import com.raghav.spacedawn.navigation.LaunchesList
+import com.raghav.spacedawn.navigation.RemindersList
+import com.raghav.spacedawn.navigation.SearchArticlesList
+import com.raghav.spacedawn.navigation.bottomBarScreens
 import com.raghav.spacedawn.ui.common.BottomNavigationBar
 import com.raghav.spacedawn.ui.fragments.articleslist.ArticlesListScreen
 import com.raghav.spacedawn.ui.fragments.launcheslist.LaunchesListScreen
