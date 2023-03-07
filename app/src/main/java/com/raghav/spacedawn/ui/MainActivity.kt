@@ -1,76 +1,108 @@
 package com.raghav.spacedawn.ui
 
-import android.content.ActivityNotFoundException
-import android.content.Intent
-import android.content.Intent.ACTION_VIEW
 import android.net.Uri
 import android.os.Bundle
-import android.view.MenuItem
-import androidx.appcompat.app.ActionBarDrawerToggle
-import androidx.appcompat.app.AppCompatActivity
+import androidx.activity.ComponentActivity
+import androidx.activity.compose.setContent
 import androidx.browser.customtabs.CustomTabsIntent
-import androidx.navigation.findNavController
-import androidx.navigation.ui.setupWithNavController
+import androidx.compose.foundation.background
+import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.padding
+import androidx.compose.material.Scaffold
+import androidx.compose.material.Surface
+import androidx.compose.runtime.Composable
+import androidx.compose.runtime.getValue
+import androidx.compose.ui.Modifier
+import androidx.compose.ui.res.colorResource
+import androidx.navigation.compose.NavHost
+import androidx.navigation.compose.composable
+import androidx.navigation.compose.currentBackStackEntryAsState
+import androidx.navigation.compose.rememberNavController
+import com.google.accompanist.themeadapter.material.MdcTheme
 import com.raghav.spacedawn.R
-import com.raghav.spacedawn.databinding.ActivityMainBinding
+import com.raghav.spacedawn.navigation.ArticlesList
+import com.raghav.spacedawn.navigation.LaunchesList
+import com.raghav.spacedawn.navigation.RemindersList
+import com.raghav.spacedawn.navigation.SearchArticlesList
+import com.raghav.spacedawn.navigation.bottomBarScreens
+import com.raghav.spacedawn.ui.common.BottomNavigationBar
+import com.raghav.spacedawn.ui.fragments.articleslist.ArticlesListScreen
+import com.raghav.spacedawn.ui.fragments.launcheslist.LaunchesListScreen
+import com.raghav.spacedawn.ui.fragments.reminderlist.RemindersListScreen
+import com.raghav.spacedawn.ui.fragments.searcharticles.SearchArticleScreen
+import com.raghav.spacedawn.utils.Helpers.Companion.navigateSingleTopTo
 import dagger.hilt.android.AndroidEntryPoint
 
 @AndroidEntryPoint
-class MainActivity : AppCompatActivity() {
-    lateinit var binding: ActivityMainBinding
-    lateinit var toggle: ActionBarDrawerToggle
+class MainActivity : ComponentActivity() {
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        binding = ActivityMainBinding.inflate(layoutInflater)
-        setContentView(binding.root)
-
-        binding.bottomNavigationView.setupWithNavController(findNavController(R.id.navHostFragment))
-
-        toggle = ActionBarDrawerToggle(this, binding.drawerLayout, R.string.open, R.string.close)
-        binding.drawerLayout.addDrawerListener(toggle)
-        toggle.syncState()
-        supportActionBar?.setDisplayHomeAsUpEnabled(true)
-        binding.navMenu.itemIconTintList = null
-        binding.navMenu.setNavigationItemSelectedListener {
-            val customTabIntent = CustomTabsIntent.Builder().build()
-            when (it.itemId) {
-                R.id.rate_on_playstore ->
-                    try {
-                        startActivity(
-                            Intent(
-                                ACTION_VIEW,
-                                Uri.parse("market://details?id=$packageName")
-                            )
-                        )
-                    } catch (e: ActivityNotFoundException) {
-                        customTabIntent.launchUrl(
-                            this,
-                            Uri.parse("http://play.google.com/store/apps/details?id=$packageName")
-                        )
-                    }
-                R.id.github_repo -> {
-                    customTabIntent.launchUrl(
-                        this,
-                        Uri.parse("https://github.com/avidraghav/SpaceFlightNewsApp")
-                    )
-                }
-
-                R.id.qsol_playstore_link -> {
-                    customTabIntent.launchUrl(
-                        this,
-                        Uri.parse("https://play.google.com/store/apps/details?id=com.application.kurukshetrauniversitypapers")
-                    )
+        setContent {
+            MdcTheme {
+                Surface(
+                    modifier = Modifier.fillMaxSize()
+                ) {
+                    SpaceDawnApp()
                 }
             }
-            true
         }
     }
 
-    override fun onOptionsItemSelected(item: MenuItem): Boolean {
-        if (toggle.onOptionsItemSelected(item)) {
-            return true
+    @Composable
+    fun SpaceDawnApp() {
+        val navController = rememberNavController()
+        val currentBackStack by navController.currentBackStackEntryAsState()
+        val currentDestination = currentBackStack?.destination
+        val currentScreen =
+            bottomBarScreens.find { it.route == currentDestination?.route } ?: ArticlesList
+
+        Scaffold(
+            bottomBar = {
+                BottomNavigationBar(
+                    allScreens = bottomBarScreens,
+                    onTabSelected = { newScreen ->
+                        navController
+                            .navigateSingleTopTo(newScreen.route)
+                    },
+                    currentScreen = currentScreen
+                )
+            }
+        ) { innerPadding ->
+            NavHost(
+                navController = navController,
+                startDestination = ArticlesList.route,
+                modifier = Modifier
+                    .background(colorResource(id = R.color.colorPrimaryDark))
+            ) {
+                composable(route = ArticlesList.route) {
+                    ArticlesListScreen(modifier = Modifier.padding(innerPadding)) {
+                        val customTabIntent = CustomTabsIntent.Builder().build()
+                        customTabIntent.launchUrl(
+                            this@MainActivity,
+                            Uri.parse(it.url)
+                        )
+                    }
+                }
+                composable(route = SearchArticlesList.route) {
+                    SearchArticleScreen(modifier = Modifier.padding(innerPadding)) {
+                        val customTabIntent = CustomTabsIntent.Builder().build()
+                        customTabIntent.launchUrl(
+                            this@MainActivity,
+                            Uri.parse(it.url)
+                        )
+                    }
+                }
+                composable(route = LaunchesList.route) {
+                    LaunchesListScreen(modifier = Modifier.padding(innerPadding)) {
+                        navController.navigateSingleTopTo(RemindersList.route)
+                    }
+                }
+
+                composable(route = RemindersList.route) {
+                    RemindersListScreen(modifier = Modifier.padding(innerPadding))
+                }
+            }
         }
-        return super.onOptionsItemSelected(item)
     }
 }

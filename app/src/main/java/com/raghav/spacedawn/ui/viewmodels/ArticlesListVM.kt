@@ -10,7 +10,7 @@ import kotlinx.coroutines.flow.emptyFlow
 import javax.inject.Inject
 
 @HiltViewModel
-class ArticlesListFragmentVM @Inject constructor(
+class ArticlesListVM @Inject constructor(
     private val repository: AppRepository
 ) : ViewModel() {
 

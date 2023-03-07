@@ -3,6 +3,8 @@ package com.raghav.spacedawn.utils
 import android.content.Context
 import android.net.ConnectivityManager
 import android.net.NetworkCapabilities
+import androidx.navigation.NavGraph.Companion.findStartDestination
+import androidx.navigation.NavHostController
 import java.text.SimpleDateFormat
 import java.util.Date
 import java.util.Locale
@@ -56,5 +58,17 @@ class Helpers {
                 else -> false
             }
         }
+
+        fun NavHostController.navigateSingleTopTo(route: String) =
+            this.navigate(route) {
+                popUpTo(
+                    this@navigateSingleTopTo.graph.findStartDestination().id
+                ) {
+                    saveState = true
+                }
+                launchSingleTop = true
+                restoreState = true
+                launchSingleTop = true
+            }
     }
 }
