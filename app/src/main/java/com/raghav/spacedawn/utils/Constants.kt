@@ -16,5 +16,11 @@ class Constants {
         const val DATABASE_NAME = "reminder_db.db"
         const val LAUNCHES_INCREMENT = 10
         const val SKIP_ARTICLES_COUNT = 10
+        const val ID_VIEW_GITHUB_REPO = "github_repo"
+        const val ID_RATE_ON_PLAYSTORE = "rate_on_playstore"
+        const val ID_MORE_APPS_FROM_DEVELOPER = "more_apps_from_developer"
+        const val QSOL_PLAYSTORE_LINK =
+            "https://play.google.com/store/apps/details?id=com.application.kurukshetrauniversitypapers"
+        const val SPACE_DAWN_PLAYSTORE_LINK = "https://github.com/avidraghav/SpaceFlightNewsApp"
     }
 }

@@ -10,7 +10,6 @@ import dagger.hilt.android.AndroidEntryPoint
 @AndroidEntryPoint
 class ArticlesListFragment : Fragment(R.layout.fragment_articles_list) {
 
-    // private val viewModel by viewModels<ArticlesListFragmentVM>()
     private lateinit var binding: FragmentArticlesListBinding
 
     companion object {
@@ -20,14 +19,5 @@ class ArticlesListFragment : Fragment(R.layout.fragment_articles_list) {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
         binding = FragmentArticlesListBinding.bind(view)
-
-        binding.composeView.setContent {
-//            MdcTheme {
-//                ArticlesListScreen(viewModel) {
-//                    val customTabIntent = CustomTabsIntent.Builder().build()
-//                    customTabIntent.launchUrl(requireContext(), Uri.parse(it.url))
-//                }
-//            }
-        }
     }
 }

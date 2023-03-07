@@ -30,6 +30,5 @@ class SearchArticleFragment : Fragment(R.layout.fragment_search_article) {
 //                val customTabIntent = CustomTabsIntent.Builder().build()
 //                customTabIntent.launchUrl(requireContext(), Uri.parse(it.url))
 //            }
-//        }
     }
 }

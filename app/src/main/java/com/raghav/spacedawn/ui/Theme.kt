@@ -1,4 +1,4 @@
-package com.raghav.spacedawn.ui.common
+package com.raghav.spacedawn.ui
 
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.ReadOnlyComposable

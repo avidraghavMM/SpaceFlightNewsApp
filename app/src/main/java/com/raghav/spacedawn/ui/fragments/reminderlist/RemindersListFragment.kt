@@ -17,35 +17,5 @@ class RemindersListFragment : Fragment(R.layout.fragment_reminders_list) {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
         binding = FragmentRemindersListBinding.bind(view)
-
-//        viewModel.getReminders().observe(
-//            viewLifecycleOwner
-//        ) {
-//            if (it.isNullOrEmpty()) {
-//                binding.tvNoRemindersForNow.visibility = View.VISIBLE
-//            }
-//            binding.composeView.setContent {
-//                RemindersList(it.reversed()) { reminder ->
-//                    cancelAlarm(reminder)
-//                }
-//            }
-//        }
     }
-
-//    private fun cancelAlarm(reminder: ReminderModelClass) {
-//        val am: AlarmManager = activity?.getSystemService(Context.ALARM_SERVICE) as AlarmManager
-//        val i = Intent(activity, AlarmBroadCastReciever::class.java)
-//        val pi = PendingIntent.getBroadcast(
-//            activity,
-//            reminder.pendingIntentId,
-//            i,
-//            PendingIntent.FLAG_CANCEL_CURRENT or PendingIntent.FLAG_IMMUTABLE
-//        )
-//        am.cancel(pi)
-//        pi.cancel()
-//        Toast.makeText(activity, getString(R.string.reminder_cancelled), Toast.LENGTH_LONG).show()
-//        lifecycleScope.launch {
-//            viewModel.deleteReminder(reminder)
-//        }
-//    }
 }

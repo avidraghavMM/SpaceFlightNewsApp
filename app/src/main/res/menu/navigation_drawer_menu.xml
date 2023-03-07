@@ -13,7 +13,7 @@
         android:title="@string/rate_space_dawn" />
     <item
         android:id="@+id/qsol_playstore_link"
-        android:icon="@drawable/ic_solution_new"
+        android:icon="@drawable/ic_more_apps"
         android:title="@string/more_apps_from_the_developer" />
 
 
