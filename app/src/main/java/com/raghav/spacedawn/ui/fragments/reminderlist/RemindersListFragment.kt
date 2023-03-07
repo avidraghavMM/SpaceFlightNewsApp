@@ -17,18 +17,5 @@ class RemindersListFragment : Fragment(R.layout.fragment_reminders_list) {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
         binding = FragmentRemindersListBinding.bind(view)
-
-        viewModel.getReminders().observe(
-            viewLifecycleOwner
-        ) {
-            if (it.isNullOrEmpty()) {
-                binding.tvNoRemindersForNow.visibility = View.VISIBLE
-            }
-            binding.composeView.setContent {
-//                RemindersList(it.reversed()) { reminder ->
-//                    cancelAlarm(reminder)
-//                }
-            }
-        }
     }
 }

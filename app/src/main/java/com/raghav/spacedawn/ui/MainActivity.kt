@@ -150,11 +150,10 @@ class MainActivity : ComponentActivity() {
                 navController = navController,
                 startDestination = ArticlesList.route,
                 modifier = Modifier
-                    .padding(innerPadding)
                     .background(colorResource(id = R.color.colorPrimaryDark))
             ) {
                 composable(route = ArticlesList.route) {
-                    ArticlesListScreen {
+                    ArticlesListScreen(modifier = Modifier.padding(innerPadding)) {
                         val customTabIntent = CustomTabsIntent.Builder().build()
                         customTabIntent.launchUrl(
                             this@MainActivity,
@@ -163,7 +162,7 @@ class MainActivity : ComponentActivity() {
                     }
                 }
                 composable(route = SearchArticlesList.route) {
-                    SearchArticleScreen {
+                    SearchArticleScreen(modifier = Modifier.padding(innerPadding)) {
                         val customTabIntent = CustomTabsIntent.Builder().build()
                         customTabIntent.launchUrl(
                             this@MainActivity,
@@ -172,13 +171,13 @@ class MainActivity : ComponentActivity() {
                     }
                 }
                 composable(route = LaunchesList.route) {
-                    LaunchesListScreen {
+                    LaunchesListScreen(modifier = Modifier.padding(innerPadding)) {
                         navController.navigateSingleTopTo(RemindersList.route)
                     }
                 }
 
                 composable(route = RemindersList.route) {
-                    RemindersListScreen()
+                    RemindersListScreen(modifier = Modifier.padding(innerPadding))
                 }
             }
         }
