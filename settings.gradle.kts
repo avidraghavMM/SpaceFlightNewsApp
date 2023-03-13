@@ -1,2 +1,2 @@
 rootProject.name = "SpaceFlightNewsApp"
-include ':app'
+include(":app")
