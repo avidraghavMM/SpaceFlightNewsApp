@@ -53,14 +53,16 @@ dependencies {
     Lib.Kotlin.list.forEach(::implementation)
     Lib.Networking.list.forEach(::implementation)
     Lib.AndroidX.Paging.list.forEach(::implementation)
+
     Lib.Google.DI.list.forEach(::implementation)
+    kapt(Lib.Google.DI.hiltCompiler)
 
     implementation(Lib.Google.MaterialDesign.materialDesign)
     testImplementation(Lib.UnitTesting.junit)
     androidTestImplementation(Lib.AndroidX.AndroidTesting.androidXJunitExtenstion)
 
     Lib.AndroidX.Room.list.forEach(::implementation)
-    add("kapt", Lib.AndroidX.Room.roomCompiler)
+    kapt(Lib.AndroidX.Room.roomCompiler)
 
     // Compose
     val composeBom = platform(Lib.AndroidX.Compose.composeBom)

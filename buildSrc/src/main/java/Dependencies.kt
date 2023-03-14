@@ -21,7 +21,7 @@ object Lib { // ktlint-disable filename
         object Room {
             private const val ROOM_VERSION = "2.4.0"
             private const val room = "androidx.room:room-runtime:$ROOM_VERSION"
-             const val roomCompiler = "androidx.room:room-compiler:$ROOM_VERSION"
+            const val roomCompiler = "androidx.room:room-compiler:$ROOM_VERSION"
             private const val roomPaging = "androidx.room:room-paging:$ROOM_VERSION"
             private const val roomKtx = "androidx.room:room-ktx:$ROOM_VERSION"
 
@@ -71,7 +71,7 @@ object Lib { // ktlint-disable filename
             const val customTab = "androidx.browser:browser:$CUSTOM_TAB_VERSION"
         }
 
-        object AndroidTesting{
+        object AndroidTesting {
             const val androidXJunitExtenstion = "androidx.test.ext:junit:1.1.5"
         }
     }
@@ -94,12 +94,13 @@ object Lib { // ktlint-disable filename
     object Google {
         object DI {
             private const val DAGGER_HILT_VERSION = "2.42"
-            const val hilt = "com.google.dagger:hilt-android:2.42"
-            const val hiltKapt = "com.google.dagger:hilt-android-compiler:2.42"
-            const val hiltNavigationCompose = "androidx.hilt:hilt-navigation-compose:1.0.0"
+            private const val hilt = "com.google.dagger:hilt-android:2.42"
+            const val hiltCompiler = "com.google.dagger:hilt-android-compiler:2.42"
+            private const val hiltNavigationCompose = "androidx.hilt:hilt-navigation-compose:1.0.0"
 
-            val list = listOf(hilt, hiltKapt, hiltNavigationCompose)
+            val list = listOf(hilt, hiltNavigationCompose)
         }
+
         object MaterialDesign {
             const val materialDesign = "com.google.android.material:material:1.4.0"
         }
@@ -119,7 +120,7 @@ object Lib { // ktlint-disable filename
         val list = listOf(retrofit, gson, okhttpInterceptor)
     }
 
-    object UnitTesting{
+    object UnitTesting {
         const val junit = "junit:junit:4.+"
     }
 }
