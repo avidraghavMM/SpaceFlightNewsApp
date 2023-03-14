@@ -106,7 +106,7 @@ object Lib { // ktlint-disable filename
     }
 
     object ImageLoading {
-        private const val COIL_VERSION = "4.12.0"
+        private const val COIL_VERSION = "2.2.2"
         const val coil = "io.coil-kt:coil-compose:$COIL_VERSION"
     }
 
